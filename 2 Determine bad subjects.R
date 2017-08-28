@@ -240,8 +240,40 @@ write.table(badSubsAP, file = "Study2_badSubsAP.txt", sep = "\t", row.names = F)
 
 
 
+# determine gender and race breakdown of sample
+temp = dat[dat$SubTrial == 1 & dat$blockName == "WIT_1",]
 
-temp = dat[dat$SubTrial == 1 & dat$blockName == "APT_1",]
-nrow(temp[temp$DemoGender.RESP == 1,])
-nrow(temp[temp$DemoGender.RESP == 2,])
-nrow(temp[temp$DemoGender.RESP == 3,])
+unique(temp$Subject[temp$DemoGender.RESP == 1]) # includes NA
+length(unique(temp$Subject[temp$DemoGender.RESP == 1])) # 109 women
+
+unique(temp$Subject[temp$DemoGender.RESP == 2]) # includes NA
+length(unique(temp$Subject[temp$DemoGender.RESP == 2])) # 94 men
+
+unique(temp$Subject[temp$DemoGender.RESP == 3]) # includes NA
+length(unique(temp$Subject[temp$DemoGender.RESP == 3])) # 1 other
+
+
+unique(temp$Subject[temp$DemoRace.RESP == 1]) # includes NA
+length(unique(temp$Subject[temp$DemoRace.RESP == 1])) # 0 American Indian
+
+unique(temp$Subject[temp$DemoRace.RESP == 2]) # includes NA
+length(unique(temp$Subject[temp$DemoRace.RESP == 2])) # 11 Asian
+
+unique(temp$Subject[temp$DemoRace.RESP == 3]) # includes NA
+length(unique(temp$Subject[temp$DemoRace.RESP == 3])) # 0 Native Hawaiian
+
+unique(temp$Subject[temp$DemoRace.RESP == 4]) # includes NA
+length(unique(temp$Subject[temp$DemoRace.RESP == 4])) # 15 Black
+
+unique(temp$Subject[temp$DemoRace.RESP == 5]) # includes NA
+length(unique(temp$Subject[temp$DemoRace.RESP == 5])) # 166 White
+
+unique(temp$Subject[temp$DemoRace.RESP == 6]) # includes NA
+length(unique(temp$Subject[temp$DemoRace.RESP == 6])) # 10 multiracial
+
+unique(temp$Subject[temp$DemoRace.RESP == 7]) # includes NA
+length(unique(temp$Subject[temp$DemoRace.RESP == 7])) # 2 unknown/choose not to answer
+
+
+unique(temp$Subject[temp$DemoEthnicity.RESP == 1]) # includes NA
+length(unique(temp$Subject[temp$DemoEthnicity.RESP == 1])) # 9 hispanic
