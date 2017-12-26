@@ -9,9 +9,10 @@ output:
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = FALSE)
 options(width=140)
 require(dplyr)
+require(tidyr)
 require(ggplot2)
 require(lme4)
 require(lmerTest)
@@ -19,7 +20,7 @@ require(knitr)
 require(reshape2)
 ```
 
-Data for Study 1 was collected in Fall 2015. Data for Study 2 was collected in Fall 2016 (hypotheses were preregistered at aspredicted.org).
+Data for Study 1 was collected in Fall 2015. Data for Study 2 was collected in Fall 2016.
 
 **In Study 1:**  
 - 101 subjects participated  
@@ -68,7 +69,7 @@ sum$`Error: Subject:PrimeType:TargetType`
 **AP**
 ``` {r AP, echo = FALSE}
 # Race x Valence on accuracy (WIT)
-sum = aov(numErr ~ PrimeType*TargetType*Observer + Error(Subject/(PrimeType*TargetType)), data = s1.acc.AP) %>% 
+sum = aov(numErr ~ PrimeType*TargetType + Error(Subject/(PrimeType*TargetType)), data = s1.acc.AP) %>% 
   summary()
 
 sum$`Error: Subject:PrimeType:TargetType`
@@ -382,8 +383,7 @@ ggsave("./Figures/CompareAC_Study2.tiff")
 lm(WITestimate ~ APTestimate*Type, data = compareAC) %>% summary()
 ```
 
-### 4. Test Observer x IMS interaction on three criterion (response accuracy bias, PDP-C, and PDP-A)  
-**IMS is standardized for models, although not in plots. Models give unstandardized estimates.**  
+### 4. Test effect of Observer on four outcomes(response accuracy bias, PDP-C, PDP-A, and anxiety)  
 #####Study 1:  
 ``` {r obsIMS1, echo=F, warning=F}
 
@@ -398,16 +398,6 @@ APT$Task = "APT"
 # put them together
 s1.wide = rbind(WIT, APT)
 
-# add IMS data
-IMS = read.delim("Study1_experimentalTrials.txt") %>% 
-  filter(blockName == "WIT", SubTrial == 1) %>% 
-  select(Subject, IMS)
-
-s1.wide$IMS = NA
-for (k in IMS$Subject[!(is.na(IMS$IMS))]) {
-  s1.wide$IMS[s1.wide$Subject == k] = IMS$IMS[IMS$Subject == k]
-}
-
 # add response accuracy data
 s1.wide$perfBias = NA
 for (k in unique(s1.perfBias$Subject)) {
@@ -415,89 +405,71 @@ for (k in unique(s1.perfBias$Subject)) {
   s1.wide$perfBias[s1.wide$Subject == k & s1.wide$Task == "APT"] = s1.perfBias$APperfBias[s1.perfBias$Subject == k]  
 }
 
-# Perf bias
-ggplot(s1.wide, aes(IMS, perfBias, color=Observer)) +
-  facet_wrap(~Task) +
-  geom_point()+
-  geom_smooth(method="lm") +
-  theme_bw() +
-  scale_color_manual(values=c("darkgreen", "green")) +
-  ylab("Performance bias") +
-  theme(plot.title=element_text(hjust=.5))
+# add anxiety
+questDat = read.delim("Study1_questDat.txt")
+questDat$blockName = as.character(questDat$blockName)
+questDat$blockName[questDat$blockName == "PostWITquestions"] = "WIT"
+questDat$blockName[questDat$blockName == "PostAPquestions"] = "AP"
+questDat$blockName = as.factor(questDat$blockName)
 
-ggsave("Figures/ObsXIMS_perfBias_Study1.tiff", width = 8, height = 4)
+names(questDat)[3] = "Resp"
 
-# PDP control
-ggplot(s1.wide, aes(IMS, MeanC, color=Observer)) +
-  facet_wrap(~Task) +
-  geom_point()+
-  geom_smooth(method="lm") +
-  theme_bw() +
-  scale_color_manual(values=c("purple4", "orchid2")) +
-  ylab("PDP control estimate") +
-  theme(plot.title=element_text(hjust=.5))
+questDat$SubTrial[questDat$SubTrial == 1] = "Frust"
+questDat$SubTrial[questDat$SubTrial == 2] = "Anx"
+questDat$SubTrial[questDat$SubTrial == 3] = "Unpleas"
+questDat$SubTrial[questDat$SubTrial == 4] = "Attend"
+questDat$SubTrial[questDat$SubTrial == 5] = "Effort"
 
-ggsave("Figures/ObsXIMS_PDPcontrol_Study1.tiff", width = 8, height = 4)
+questWide = spread(questDat, SubTrial, Resp)
 
-# PDP auto
-ggplot(s1.wide, aes(IMS, AResid, color=Observer)) +
-  facet_wrap(~Task)+
-  geom_point()+
-  geom_smooth(method="lm") +
-  theme_bw() +
-  scale_color_manual(values=c("red4", "tomato")) +
-  ylab("PDP auto estimate") +
-  theme(plot.title=element_text(hjust=.5))
+questWide$Anx_comp = (questWide$Frust + questWide$Anx + questWide$Unpleas)/3
 
-ggsave("Figures/ObsXIMS_PDPauto_Study1.tiff", width = 8, height = 4)
+s1.wide$Anx_comp = NA
+for (k in unique(questWide$Subject)) {
+  s1.wide$Anx_comp[s1.wide$Subject == k & s1.wide$Task == "WIT"] = questWide$Anx_comp[questWide$Subject == k  & questWide$blockName == "WIT"]
+  s1.wide$Anx_comp[s1.wide$Subject == k & s1.wide$Task == "APT"] = questWide$Anx_comp[questWide$Subject == k & questWide$blockName == "AP"]  
+}
 
-m1 = lm(perfBias ~ scale(IMS)*Observer*Task, data = s1.wide) %>% 
+# Performance bias
+m1 = aov(perfBias ~ Observer*Task + Error(Subject/(Task)), data = s1.wide) %>% 
   summary()
-m2 = lm(MeanC ~ scale(IMS)*Observer*Task, data = s1.wide) %>% 
+# PDP-A
+m2 = aov(AResid ~ Observer*Task + Error(Subject/(Task)), data = s1.wide) %>% 
   summary()
-m3 = lm(AResid ~ scale(IMS)*Observer*Task, data = s1.wide) %>% 
+# PDP-C
+m3 = aov(MeanC ~ Observer*Task + Error(Subject/(Task)), data = s1.wide) %>% 
   summary()
-
-
+# Anxiety composite
+m4 = aov(Anx_comp ~ Observer*Task + Error(Subject/(Task)), data = s1.wide) %>% 
+  summary()
 
 ```
 
 **Perf bias:**
-
-``` {r table1, echo=F}
-kable(m1$coefficients)
-```
-
-**PDP-C estimates:**
-
-``` {r table2, echo=F}
-kable(m2$coefficients)
+``` {r}
+m1
 ```
 
 **PDP-A estimates:**
 
-``` {r table3, echo=F}
-kable(m3$coefficients)
+``` {r}
+m2
 ```
 
-``` {r followup, echo=T}
-# Look at each level of observer separately
-## Present
-lm(AResid ~ scale(IMS)*Task, data = s1.wide[s1.wide$Observer == "Present",]) %>%
-  summary()
-## Absent
-lm(AResid ~ scale(IMS)*Task, data = s1.wide[s1.wide$Observer == "Absent",]) %>%
-  summary()
+**PDP-C estimates:**
 
-# simple slopes
-lm(scale(AResid) ~ scale(IMS), data = s1.wide[s1.wide$Observer == "Present" & s1.wide$Task == "APT",]) %>%
-  summary()
-lm(scale(AResid) ~ scale(IMS), data = s1.wide[s1.wide$Observer == "Present" & s1.wide$Task == "WIT",]) %>%
-  summary()
-
+``` {r}
+m3
 ```
 
-#####Study 2: 
+**Anxiety composite:**
+
+``` {r}
+m4
+```
+
+
+#####Study 2: START HERE
 ``` {r obsIMS2, echo=F, warning=F}
 # read in PDP estimates in wide format
 
@@ -640,6 +612,7 @@ collapseBlock = select(anxDat, Subject, Task, Anx_composite) %>%
   group_by(Subject, Task) %>% 
   summarise_each(funs(mean(., na.rm=T))) %>% 
   as.data.frame()
+
 
 # add anxiety scores to s2.wide, which has PDP-C, PDP-A, Observer, and IMS
 s2.wide$Anx_composite = NA

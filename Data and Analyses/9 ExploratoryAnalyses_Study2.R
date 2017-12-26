@@ -29,6 +29,9 @@ ggplot(s2.wide, aes(scale(SA), Anx_composite, color = Observer, shape = Observer
 
 lmer(scale(Anx_composite) ~ scale(SA)*Observer*Task + (1|Subject), data = s2.wide) %>% summary()
 
+noMissing = s2.wide[!(s2.wide$Subject %in% c(111, 189, 201)),]
+cor.test(noMissing$Anx_composite[noMissing$Task == "WIT"], noMissing$SA[noMissing$Task == "WIT"])
+cor.test(noMissing$Anx_composite[noMissing$Task == "APT"], noMissing$SA[noMissing$Task == "APT"])
 
 # Look very similar to IMS results, but SA and IMS are not highly correlated, r = .007, p = .899.  
 # 
