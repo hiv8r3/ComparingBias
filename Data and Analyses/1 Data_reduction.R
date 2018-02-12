@@ -3,7 +3,6 @@
 # Adds IMS/EMS data; calculates alphas for both scales
 
 require(dplyr)
-require(magrittr)
 require(tidyr)
 
 
@@ -412,6 +411,15 @@ questWide$Anx_composite = (scale(questWide$SelfConscious) +
 
 write.table(questWide, file = "Study2_questDat.txt", sep = "\t", row.names = F)
 
-comp = select(questWide, SelfConscious, Worried, Uncomf, Bothered, Dread, Anx, Nerv, Worry)
+questWide$blockName = as.character(questWide$blockName)
+APTcomp = select(questWide, -Anx_composite) %>% 
+  filter(blockName == "APT_Qs_1"|blockName == "APT_Qs_2") %>% 
+  select(SelfConscious, Worried, Uncomf, Bothered, Dread, Anx, Nerv, Worry)
+
+WITcomp = select(questWide, -Anx_composite) %>% 
+  filter(blockName == "WIT_Qs_1"|blockName == "WIT_Qs_2") %>% 
+  select(SelfConscious, Worried, Uncomf, Bothered, Dread, Anx, Nerv, Worry)
+
 require(psych)
-alpha(comp)
+alpha(APTcomp)
+alpha(WITcomp)
