@@ -9,7 +9,7 @@ output:
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = FALSE)
 options(width=140)
 require(dplyr)
 require(tidyr)
@@ -412,218 +412,8 @@ reduced = lm(WITestimate ~ APTestimate+Type, data = compareAC) %>% summary()
 
 ```
 
-### 4. Test Observer x IMS interaction on three criterion (response accuracy bias, PDP-C, and PDP-A)  
-**IMS is standardized for models, although not in plots. Models give unstandardized estimates.**  
-#####Study 1:  
-``` {r obsIMS1, echo=F, warning=F}
 
-WIT = select(s1.widePDP, Subject, Observer, WIT_MeanC, WIT_AResid) %>% 
-  rename(MeanC = WIT_MeanC, AResid = WIT_AResid)
-WIT$Task = "WIT"
-
-APT = select(s1.widePDP, Subject, Observer, APT_MeanC, APT_AResid) %>% 
-  rename(MeanC = APT_MeanC, AResid = APT_AResid)
-APT$Task = "APT"
-
-# put them together
-s1.wide = rbind(WIT, APT)
-
-# add IMS data
-IMS = read.delim("Study1_experimentalTrials.txt") %>% 
-  filter(blockName == "WIT", SubTrial == 1) %>% 
-  select(Subject, IMS)
-
-s1.wide$IMS = NA
-for (k in IMS$Subject[!(is.na(IMS$IMS))]) {
-  s1.wide$IMS[s1.wide$Subject == k] = IMS$IMS[IMS$Subject == k]
-}
-
-# add response accuracy data
-s1.wide$perfBias = NA
-for (k in unique(s1.perfBias$Subject)) {
-  s1.wide$perfBias[s1.wide$Subject == k & s1.wide$Task == "WIT"] = s1.perfBias$WITperfBias[s1.perfBias$Subject == k]
-  s1.wide$perfBias[s1.wide$Subject == k & s1.wide$Task == "APT"] = s1.perfBias$APperfBias[s1.perfBias$Subject == k]  
-}
-
-# Perf bias
-ggplot(s1.wide, aes(IMS, perfBias, color=Observer)) +
-  facet_wrap(~Task) +
-  geom_point()+
-  geom_smooth(method="lm") +
-  theme_bw() +
-  scale_color_manual(values=c("darkgreen", "green")) +
-  ylab("Performance bias") +
-  theme(plot.title=element_text(hjust=.5))
-
-ggsave("Figures/ObsXIMS_perfBias_Study1.tiff", width = 8, height = 4)
-
-# PDP control
-ggplot(s1.wide, aes(IMS, MeanC, color=Observer)) +
-  facet_wrap(~Task) +
-  geom_point()+
-  geom_smooth(method="lm") +
-  theme_bw() +
-  scale_color_manual(values=c("purple4", "orchid2")) +
-  ylab("PDP control estimate") +
-  theme(plot.title=element_text(hjust=.5))
-
-ggsave("Figures/ObsXIMS_PDPcontrol_Study1.tiff", width = 8, height = 4)
-
-# PDP auto
-ggplot(s1.wide, aes(IMS, AResid, color=Observer)) +
-  facet_wrap(~Task)+
-  geom_point()+
-  geom_smooth(method="lm") +
-  theme_bw() +
-  scale_color_manual(values=c("red4", "tomato")) +
-  ylab("PDP auto estimate") +
-  theme(plot.title=element_text(hjust=.5))
-
-ggsave("Figures/ObsXIMS_PDPauto_Study1.tiff", width = 8, height = 4)
-
-m1 = lm(perfBias ~ scale(IMS)*Observer*Task, data = s1.wide) %>% 
-  summary()
-m2 = lm(MeanC ~ scale(IMS)*Observer*Task, data = s1.wide) %>% 
-  summary()
-m3 = lm(AResid ~ scale(IMS)*Observer*Task, data = s1.wide) %>% 
-  summary()
-
-
-
-```
-
-**Perf bias:**
-
-``` {r table1, echo=F}
-kable(m1$coefficients)
-```
-
-**PDP-C estimates:**
-
-``` {r table2, echo=F}
-kable(m2$coefficients)
-```
-
-**PDP-A estimates:**
-
-``` {r table3, echo=F}
-kable(m3$coefficients)
-```
-
-``` {r followup, echo=T}
-# Look at each level of observer separately
-## Present
-lm(AResid ~ scale(IMS)*Task, data = s1.wide[s1.wide$Observer == "Present",]) %>%
-  summary()
-## Absent
-lm(AResid ~ scale(IMS)*Task, data = s1.wide[s1.wide$Observer == "Absent",]) %>%
-  summary()
-
-# simple slopes
-lm(scale(AResid) ~ scale(IMS), data = s1.wide[s1.wide$Observer == "Present" & s1.wide$Task == "APT",]) %>%
-  summary()
-lm(scale(AResid) ~ scale(IMS), data = s1.wide[s1.wide$Observer == "Present" & s1.wide$Task == "WIT",]) %>%
-  summary()
-
-```
-
-#####Study 2: 
-``` {r obsIMS2, echo=F, warning=F}
-# read in PDP estimates in wide format
-
-WIT = select(s2.widePDP, Subject, Observer, WIT_MeanC, WIT_AResid) %>% 
-  rename(MeanC = WIT_MeanC, AResid = WIT_AResid)
-WIT$Task = "WIT"
-
-APT = select(s2.widePDP, Subject, Observer, APT_MeanC, APT_AResid) %>% 
-  rename(MeanC = APT_MeanC, AResid = APT_AResid)
-APT$Task = "APT"
-
-# put them together
-s2.wide = rbind(WIT, APT)
-
-# add IMS data
-IMS = read.delim("Study2_experimentalTrials.txt") %>% 
-  filter(blockName == "WIT_1", SubTrial == 1) %>% 
-  select(Subject, IMS)
-
-s2.wide$IMS = NA
-for (k in IMS$Subject[!(is.na(IMS$IMS))]) {
-  s2.wide$IMS[s2.wide$Subject == k] = IMS$IMS[IMS$Subject == k]
-}
-
-# add response accuracy data
-s2.wide$perfBias = NA
-for (k in unique(s2.perfBias$Subject)) {
-  s2.wide$perfBias[s2.wide$Subject == k & s2.wide$Task == "WIT"] = s2.perfBias$WITperfBias[s2.perfBias$Subject == k]
-  s2.wide$perfBias[s2.wide$Subject == k & s2.wide$Task == "APT"] = s2.perfBias$APperfBias[s2.perfBias$Subject == k]  
-}
-
-# Perf bias
-ggplot(s2.wide, aes(IMS, perfBias, color=Observer)) +
-  facet_wrap(~Task) +
-  geom_point()+
-  geom_smooth(method="lm") +
-  theme_bw() +
-  scale_color_manual(values=c("darkgreen", "green")) +
-  ylab("Performance bias") +
-  theme(plot.title=element_text(hjust=.5))
-
-ggsave("Figures/ObsXIMS_perfBias_Study2.tiff", width = 8, height = 4)
-
-
-# PDP control
-ggplot(s2.wide, aes(IMS, MeanC, color=Observer)) +
-  facet_wrap(~Task) +
-  geom_point()+
-  geom_smooth(method="lm") +
-  theme_bw() +
-  scale_color_manual(values=c("purple4", "orchid2")) +
-  ylab("PDP control estimate") +
-  theme(plot.title=element_text(hjust=.5))
-
-ggsave("Figures/ObsXIMS_PDPcontrol_Study2.tiff", width = 8, height = 4)
-
-# PDP auto
-ggplot(s2.wide, aes(IMS, AResid, color=Observer)) +
-  facet_wrap(~Task)+
-  geom_point()+
-  geom_smooth(method="lm") +
-  theme_bw() +
-  scale_color_manual(values=c("red4", "tomato")) +
-  ylab("PDP auto estimate") +
-  theme(plot.title=element_text(hjust=.5))
-
-ggsave("Figures/ObsXIMS_PDPauto_Study2.tiff", width = 8, height = 4)
-
-m4 = lm(perfBias ~ scale(IMS)*Observer*Task + (1|Subject), data = s2.wide) %>% 
-  summary()
-m5 = lm(MeanC ~ scale(IMS)*Observer*Task + (1|Subject), data = s2.wide) %>% 
-  summary()
-m6 = lm(AResid ~ scale(IMS)*Observer*Task + (1|Subject), data = s2.wide) %>% 
-  summary()
-
-```
-
-**Perf bias:**
-
-``` {r table4, echo=F}
-kable(m4$coefficients)
-```
-
-**PDP-C estimates:**
-
-``` {r table5, echo=F}
-kable(m5$coefficients)
-```
-
-**PDP-A estimates:**
-
-``` {r table6, echo=F}
-kable(m6$coefficients)
-```
-
-### 5. Make composite for anxiety in Study 2
+### 4. Make composite for anxiety in Study 2
 
 ``` {r composite, echo = F}
 anxDat = read.delim("Study2_questDat.txt")
@@ -662,22 +452,195 @@ ggplot(sepBlock, aes(Anx_composite1, Anx_composite2, color = Task)) +
 
 The correlation between the anxiety composite score on the first block and the second block is `r cor(sepBlock$Anx_composite1[sepBlock$Subject !=87], sepBlock$Anx_composite2[sepBlock$Subject !=87])`.  
 
-### 8. Look at relationship between anxiety and PDP-A/PDP-C
-Anxiety composite scores were averaged across blocks, so each participant has one anxiety score per task.
+### 5. Effect of observer on response accuracy bias, PDP-A, PDP-C, anxiety
 
-``` {r anx, echo=F}
+####Study 1:  
+``` {r}
+
+WIT = select(s1.widePDP, Subject, Observer, WIT_MeanC, WIT_AResid) %>% 
+  rename(MeanC = WIT_MeanC, AResid = WIT_AResid)
+WIT$Task = "WIT"
+
+APT = select(s1.widePDP, Subject, Observer, APT_MeanC, APT_AResid) %>% 
+  rename(MeanC = APT_MeanC, AResid = APT_AResid)
+APT$Task = "APT"
+
+# put them together
+s1.wide = rbind(WIT, APT)
+
+# add response accuracy data
+s1.wide$perfBias = NA
+for (k in unique(s1.perfBias$Subject)) {
+  s1.wide$perfBias[s1.wide$Subject == k & s1.wide$Task == "WIT"] = s1.perfBias$WITperfBias[s1.perfBias$Subject == k]
+  s1.wide$perfBias[s1.wide$Subject == k & s1.wide$Task == "APT"] = s1.perfBias$APperfBias[s1.perfBias$Subject == k]  
+}
+
+# create error-related distress
+questDat = read.delim("Study1_questDat.txt")
+# Add post-task questions
+questDat$blockName = as.character(questDat$blockName)
+questDat$blockName[questDat$blockName == "PostWITquestions"] = "WIT"
+questDat$blockName[questDat$blockName == "PostAPquestions"] = "APT"
+questDat$blockName = as.factor(questDat$blockName)
+
+names(questDat)[3] = "Resp"
+
+dat = data.frame(Subject = rep(unique(questDat$Subject), each = 2),
+                 blockName = rep(c("WIT", "APT"), length(unique(questDat$Subject))))
+for (i in unique(questDat$Subject)) {
+  for (j in c("WIT", "APT")) {
+    dat$Frust[dat$Subject == i & dat$blockName == j] = questDat$Resp[questDat$Subject == i & 
+                                                                     questDat$SubTrial == 1 &
+                                                                     questDat$blockName == j]
+    dat$Anx[dat$Subject == i & dat$blockName == j] = questDat$Resp[questDat$Subject == i & 
+                                                                   questDat$SubTrial == 2 &
+                                                                   questDat$blockName == j]
+    dat$Unpleas[dat$Subject == i & dat$blockName == j] = questDat$Resp[questDat$Subject == i & 
+                                                                       questDat$SubTrial == 3 &
+                                                                       questDat$blockName == j]
+    dat$Attend[dat$Subject == i & dat$blockName == j] = questDat$Resp[questDat$Subject == i & 
+                                                                      questDat$SubTrial == 4 &
+                                                                      questDat$blockName == j]
+    dat$Effort[dat$Subject == i & dat$blockName == j] = questDat$Resp[questDat$Subject == i & 
+                                                                      questDat$SubTrial == 5 &
+                                                                      questDat$blockName == j]
+  }
+}
+
+dat$Err_comp = (dat$Frust + dat$Anx + dat$Unpleas)/3
+
+# add error-related distress to s1.wide
+s1.wide$ErrDistress = NA
+for (i in unique(s1.wide$Subject)) {
+  for (t in c("WIT", "APT")) {
+    s1.wide$ErrDistress[s1.wide$Subject == i & s1.wide$Task == t] = dat$Err_comp[dat$Subject == i & dat$blockName == t]
+  }
+}
+
+# Perf bias
+m1 = lm(perfBias ~ Observer*Task, data = s1.wide) %>% 
+  summary()
+
+# PDP control
+m2 = lm(MeanC ~ Observer*Task, data = s1.wide) %>% 
+  summary()
+
+# PDP auto
+m3 = lm(AResid ~ Observer*Task, data = s1.wide) %>% 
+  summary()
+
+# Error-related distress
+m4 = lm(ErrDistress ~ Observer*Task, data = s1.wide) %>% 
+  summary()
+
+```
+
+**Perf bias:**
+  
+``` {r}
+kable(m1$coefficients)
+```
+
+**PDP-C estimates:**
+  
+``` {r}
+kable(m2$coefficients)
+```
+
+**PDP-A estimates:**
+  
+``` {r}
+kable(m3$coefficients)
+```
+
+**Error-related distress:**
+  
+``` {r}
+kable(m4$coefficients)
+```
+
+####Study 2:  
+``` {r}
+WIT = select(s2.widePDP, Subject, Observer, WIT_MeanC, WIT_AResid) %>% 
+  rename(MeanC = WIT_MeanC, AResid = WIT_AResid)
+WIT$Task = "WIT"
+
+APT = select(s2.widePDP, Subject, Observer, APT_MeanC, APT_AResid) %>% 
+  rename(MeanC = APT_MeanC, AResid = APT_AResid)
+APT$Task = "APT"
+
+# put them together
+s2.wide = rbind(WIT, APT)
+
+
+# add response accuracy data
+s2.wide$perfBias = NA
+for (k in unique(s2.perfBias$Subject)) {
+  s2.wide$perfBias[s2.wide$Subject == k & s2.wide$Task == "WIT"] = s2.perfBias$WITperfBias[s2.perfBias$Subject == k]
+  s2.wide$perfBias[s2.wide$Subject == k & s2.wide$Task == "APT"] = s2.perfBias$APperfBias[s2.perfBias$Subject == k]  
+}
+
+# add anxiety scores to s2.wide, which has PDP-C, PDP-A, and Observer
 collapseBlock = select(anxDat, Subject, Task, Anx_composite) %>% 
   group_by(Subject, Task) %>% 
   summarise_each(funs(mean(., na.rm=T))) %>% 
   as.data.frame()
 
-# add anxiety scores to s2.wide, which has PDP-C, PDP-A, Observer, and IMS
 s2.wide$Anx_composite = NA
 for (i in unique(s2.wide$Subject)) {
   for (t in c("WIT", "APT")) {
     s2.wide$Anx_composite[s2.wide$Subject == i & s2.wide$Task == t] = collapseBlock$Anx_composite[collapseBlock$Subject == i & collapseBlock$Task == t]
   }
 }
+
+
+# Perf bias
+m5 = lm(perfBias ~ Observer*Task, data = s2.wide) %>% 
+  summary()
+
+# PDP control
+m6 = lm(MeanC ~ Observer*Task, data = s2.wide) %>% 
+  summary()
+
+# PDP auto
+m7 = lm(AResid ~ Observer*Task, data = s2.wide) %>% 
+  summary()
+
+# Anxiety composite
+m8 = lm(Anx_composite ~ Observer*Task, data = s2.wide) %>% 
+  summary()
+
+
+```
+
+**Perf bias:**
+  
+``` {r}
+kable(m5$coefficients)
+```
+
+**PDP-C estimates:**
+  
+``` {r}
+kable(m6$coefficients)
+```
+
+**PDP-A estimates:**
+  
+``` {r}
+kable(m7$coefficients)
+```
+
+**Anxiety composite:**
+  
+``` {r}
+kable(m8$coefficients)
+```
+
+### 6. Look at relationship between anxiety and PDP-A/PDP-C
+Anxiety composite scores were averaged across blocks, so each participant has one anxiety score per task.
+
+``` {r anx, echo=F}
 
 ggplot(s2.wide, aes(scale(Anx_composite), MeanC, color = Task, shape = Task)) +
   geom_point() +
@@ -718,100 +681,6 @@ ggplot(s2.wide, aes(scale(Anx_composite), AResid, color = Task, shape = Task)) +
 ggsave("./Figures/AnxPredictingPDPA.tiff")
 
 lmer(AResid ~ scale(Anx_composite)*Task + (1|Subject), data = s2.wide) %>% summary()
-
-```
-
-
-### 9. Look at relationship between IMS and anxiety, as a function of observer
-
-
-``` {r IMS, echo=F}
-
-ggplot(s2.wide, aes(scale(IMS), Anx_composite, color = Observer, shape = Observer)) +
-  facet_wrap(~Task) +
-  geom_point() +
-  geom_smooth(method="lm") +
-  scale_color_manual(values=c("dodgerblue", "darkblue")) +
-  scale_shape_manual(values=c(1,2)) +
-  labs(x = "IMS", y = "Anxiety composite score") +
-  theme_bw() +
-  theme(panel.grid.major = element_line(color = "white"),
-        panel.grid.minor = element_line(color = "white"),
-        strip.text.x = element_text(face = "bold", size = 14),
-        strip.background = element_rect(fill = "grey98"),
-        axis.text.x = element_text(size = 16),
-        axis.text.y = element_text(size = 16),
-        axis.title.x = element_text(size = 20),
-        axis.title.y = element_text(size = 20))
-ggsave("./Figures/IMSxObsPredictingAnx.tiff", width=8, height=6, unit="in")
-
-lmer(scale(Anx_composite) ~ scale(IMS)*Observer*Task + (1|Subject), data = s2.wide) %>% summary()
-
-```
-
-### 10. Look at relationship between EMS and anxiety, as a function of observer
-
-``` {r EMS, echo=F}
-# add IMS data
-EMS = read.delim("Study2_experimentalTrials.txt") %>% 
-  filter(blockName == "WIT_1", SubTrial == 1) %>% 
-  select(Subject, EMS)
-
-s2.wide$EMS = NA
-for (k in EMS$Subject[!(is.na(EMS$EMS))]) {
-  s2.wide$EMS[s2.wide$Subject == k] = EMS$EMS[EMS$Subject == k]
-}
-
-ggplot(s2.wide, aes(scale(EMS), Anx_composite, color = Observer, shape = Observer)) +
-  facet_wrap(~Task) +
-  geom_point() +
-  geom_smooth(method="lm") +
-  scale_color_manual(values=c("red", "darkred")) +
-  scale_shape_manual(values=c(1,2)) +
-  labs(x = "EMS", y = "Anxiety composite score") +
-  theme_bw() +
-  theme(panel.grid.major = element_line(color = "white"),
-        panel.grid.minor = element_line(color = "white"),
-        strip.text.x = element_text(face = "bold", size = 14),
-        strip.background = element_rect(fill = "grey98"),
-        axis.text.x = element_text(size = 16),
-        axis.text.y = element_text(size = 16),
-        axis.title.x = element_text(size = 20),
-        axis.title.y = element_text(size = 20))
-ggsave("./Figures/EMSxObsPredictingAnx.tiff", width=8, height=6, unit="in")
-
-lmer(scale(Anx_composite) ~ scale(EMS)*Observer*Task + (1|Subject), data = s2.wide) %>% summary()
-
-
-```
-
-### 11. Look at relationship between IMS-EMS and anxiety, as a function of observer
-
-``` {r IMS-EMS, echo=F}
-
-s2.wide$IMS.EMS.diff = s2.wide$IMS - s2.wide$EMS
-
-hist(s2.wide$IMS.EMS.diff)
-
-ggplot(s2.wide, aes(scale(IMS.EMS.diff), Anx_composite, color = Observer, shape = Observer)) +
-  facet_wrap(~Task) +
-  geom_point() +
-  geom_smooth(method="lm") +
-  scale_color_manual(values=c("orchid", "purple")) +
-  scale_shape_manual(values=c(1,2)) +
-  labs(x = "IMS minus EMS", y = "Anxiety composite score") +
-  theme_bw() +
-  theme(panel.grid.major = element_line(color = "white"),
-        panel.grid.minor = element_line(color = "white"),
-        strip.text.x = element_text(face = "bold", size = 14),
-        strip.background = element_rect(fill = "grey98"),
-        axis.text.x = element_text(size = 16),
-        axis.text.y = element_text(size = 16),
-        axis.title.x = element_text(size = 20),
-        axis.title.y = element_text(size = 20))
-
-lmer(scale(Anx_composite) ~ scale(IMS.EMS.diff)*Observer*Task + (1|Subject), data = s2.wide) %>% summary()
-
 
 ```
 
