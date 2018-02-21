@@ -517,46 +517,65 @@ for (i in unique(s1.wide$Subject)) {
   }
 }
 
+# change subject to factor for repeated measures ANOVA
+s1.wide$Subject = factor(s1.wide$Subject)
+
+
+# Calculate partial etq-squared 
+# SS.effect/(SS.effect + SS.total)
+
 # Perf bias
-m1 = lm(perfBias ~ Observer*Task, data = s1.wide) %>% 
+m1 = aov(perfBias ~ Observer*Task + Error(Subject/(Task)), data = s1.wide) %>% 
   summary()
+m1.es = data.frame(Effect = c("Observer", "Task", "Observer x Task"),
+                   PartialEtaSquared = round(c(.0007/(.0007+1.72), .0244/(.0244+1.159), .0356/(.0356+1.159)), digits = 3))
 
 # PDP control
-m2 = lm(MeanC ~ Observer*Task, data = s1.wide) %>% 
+m2 = aov(MeanC ~ Observer*Task + Error(Subject/(Task)), data = s1.wide) %>% 
   summary()
+m2.es = data.frame(Effect = c("Observer", "Task", "Observer x Task"),
+                   PartialEtaSquared = round(c(.013/(.013+5.866), .001/(.001+1.395), .01/(.01+1.395)), digits = 3))
 
 # PDP auto
-m3 = lm(AResid ~ Observer*Task, data = s1.wide) %>% 
+m3 = aov(AResid ~ Observer*Task + Error(Subject/(Task)), data = s1.wide) %>% 
   summary()
+m3.es = data.frame(Effect = c("Observer", "Task", "Observer x Task"),
+                   PartialEtaSquared = round(c(.01/(.01+2.58), .0007/(.0007+1.59), .0278/(.0278+1.59)), digits = 3))
 
 # Error-related distress
-m4 = lm(ErrDistress ~ Observer*Task, data = s1.wide) %>% 
+m4 = aov(ErrDistress ~ Observer*Task + Error(Subject/(Task)), data = s1.wide) %>% 
   summary()
+m4.es = data.frame(Effect = c("Observer", "Task", "Observer x Task"),
+                   PartialEtaSquared = round(c(.06/(.06+224), .000/(.0000+42), .02/(.02+42)), digits = 3))
 
 ```
 
 **Perf bias:**
   
 ``` {r}
-kable(m1$coefficients)
+m1
+m1.es
 ```
 
 **PDP-C estimates:**
   
 ``` {r}
-kable(m2$coefficients)
+m2
+m2.es
 ```
 
 **PDP-A estimates:**
   
 ``` {r}
-kable(m3$coefficients)
+m3
+m3.es
 ```
 
 **Error-related distress:**
   
 ``` {r}
-kable(m4$coefficients)
+m4
+m4.es
 ```
 
 ####Study 2:  
@@ -593,22 +612,36 @@ for (i in unique(s2.wide$Subject)) {
   }
 }
 
+# change subject to factor for repeated measures ANOVA
+s2.wide$Subject = factor(s2.wide$Subject)
+
+
+# Calculate partial etq-squared for 2 way interaction
+# SS.effect/(SS.effect + SS.total)
 
 # Perf bias
-m5 = lm(perfBias ~ Observer*Task, data = s2.wide) %>% 
+m5 = aov(perfBias ~ Observer*Task + Error(Subject/(Task)), data = s2.wide) %>% 
   summary()
+m5.es = data.frame(Effect = c("Observer", "Task", "Observer x Task"),
+                   PartialEtaSquared = round(c(.005/(.005+4.48), .0329/(.0329+1.888), .0410/(.0412+1.888)), digits = 3))
 
 # PDP control
-m6 = lm(MeanC ~ Observer*Task, data = s2.wide) %>% 
+m6 = aov(MeanC ~ Observer*Task + Error(Subject/(Task)), data = s2.wide) %>% 
   summary()
+m6.es = data.frame(Effect = c("Observer", "Task", "Observer x Task"),
+                   PartialEtaSquared = round(c(.044/(.044+16.96), .492/(.492+3.589), .007/(.007+3.589)), digits = 3))
 
 # PDP auto
-m7 = lm(AResid ~ Observer*Task, data = s2.wide) %>% 
+m7 = aov(AResid ~ Observer*Task + Error(Subject/(Task)), data = s2.wide) %>% 
   summary()
+m7.es = data.frame(Effect = c("Observer", "Task", "Observer x Task"),
+                   PartialEtaSquared = round(c(.047/(.047+5.8), .000/(.000+3.48), .003/(.003+3.48)), digits = 3))
 
-# Anxiety composite
-m8 = lm(Anx_composite ~ Observer*Task, data = s2.wide) %>% 
+# Error-related distress
+m8 = aov(Anx_composite ~ Observer*Task + Error(Subject/(Task)), data = s2.wide) %>% 
   summary()
+m8.es = data.frame(Effect = c("Observer", "Task", "Observer x Task"),
+                   PartialEtaSquared = round(c(.04/(.04+205), .258/(.258+17.1), .025/(.025+17.1)), digits = 3))
 
 
 ```
@@ -616,25 +649,43 @@ m8 = lm(Anx_composite ~ Observer*Task, data = s2.wide) %>%
 **Perf bias:**
   
 ``` {r}
-kable(m5$coefficients)
+m5
+m5.es
 ```
 
 **PDP-C estimates:**
   
 ``` {r}
-kable(m6$coefficients)
+m6
+m6.es
 ```
 
 **PDP-A estimates:**
   
 ``` {r}
-kable(m7$coefficients)
+m7
+m7.es
 ```
 
 **Anxiety composite:**
   
 ``` {r}
-kable(m8$coefficients)
+m8
+m8.es
+```
+
+**Moderation of observer effect by anxiety:**
+Uses a multiple regression because of continuous nature of anxiety.
+```{r}
+lm(perfBias ~ Observer*Anx_composite, data = s2.wide) %>% 
+  summary()
+
+lm(MeanC ~ Observer*Anx_composite, data = s2.wide) %>% 
+  summary()
+
+lm(AResid ~ Observer*Anx_composite, data = s2.wide) %>% 
+  summary()
+
 ```
 
 ### 6. Look at relationship between anxiety and PDP-A/PDP-C

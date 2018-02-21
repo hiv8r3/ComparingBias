@@ -381,344 +381,142 @@ $(document).ready(function () {
 <div id="study-1-2" class="section level4">
 <h4>Study 1:</h4>
 <p><strong>Perf bias:</strong></p>
-<table>
-<thead>
-<tr class="header">
-<th></th>
-<th align="right">Estimate</th>
-<th align="right">Std. Error</th>
-<th align="right">t value</th>
-<th align="right">Pr(&gt;|t|)</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td>(Intercept)</td>
-<td align="right">0.0782407</td>
-<td align="right">0.0190765</td>
-<td align="right">4.101413</td>
-<td align="right">0.0000627</td>
-</tr>
-<tr class="even">
-<td>ObserverPresent</td>
-<td align="right">0.0321759</td>
-<td align="right">0.0269783</td>
-<td align="right">1.192660</td>
-<td align="right">0.2346081</td>
-</tr>
-<tr class="odd">
-<td>TaskWIT</td>
-<td align="right">0.0513889</td>
-<td align="right">0.0269783</td>
-<td align="right">1.904824</td>
-<td align="right">0.0584338</td>
-</tr>
-<tr class="even">
-<td>ObserverPresent:TaskWIT</td>
-<td align="right">-0.0562500</td>
-<td align="right">0.0381531</td>
-<td align="right">-1.474324</td>
-<td align="right">0.1421807</td>
-</tr>
-</tbody>
-</table>
+<pre><code>## 
+## Error: Subject
+##           Df Sum Sq  Mean Sq F value Pr(&gt;F)
+## Observer   1 0.0007 0.000738   0.038  0.846
+## Residuals 88 1.7231 0.019581               
+## 
+## Error: Subject:Task
+##               Df Sum Sq Mean Sq F value Pr(&gt;F)
+## Task           1 0.0244 0.02435   1.849  0.177
+## Observer:Task  1 0.0356 0.03560   2.703  0.104
+## Residuals     88 1.1591 0.01317</code></pre>
+<pre><code>##            Effect PartialEtaSquared
+## 1        Observer             0.000
+## 2            Task             0.021
+## 3 Observer x Task             0.030</code></pre>
 <p><strong>PDP-C estimates:</strong></p>
-<table>
-<thead>
-<tr class="header">
-<th></th>
-<th align="right">Estimate</th>
-<th align="right">Std. Error</th>
-<th align="right">t value</th>
-<th align="right">Pr(&gt;|t|)</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td>(Intercept)</td>
-<td align="right">0.3483796</td>
-<td align="right">0.0302786</td>
-<td align="right">11.5057888</td>
-<td align="right">0.0000000</td>
-</tr>
-<tr class="even">
-<td>ObserverPresent</td>
-<td align="right">0.0319444</td>
-<td align="right">0.0428205</td>
-<td align="right">0.7460089</td>
-<td align="right">0.4566573</td>
-</tr>
-<tr class="odd">
-<td>TaskWIT</td>
-<td align="right">0.0196759</td>
-<td align="right">0.0428205</td>
-<td align="right">0.4594982</td>
-<td align="right">0.6464435</td>
-</tr>
-<tr class="even">
-<td>ObserverPresent:TaskWIT</td>
-<td align="right">-0.0300926</td>
-<td align="right">0.0605573</td>
-<td align="right">-0.4969278</td>
-<td align="right">0.6198602</td>
-</tr>
-</tbody>
-</table>
+<pre><code>## 
+## Error: Subject
+##           Df Sum Sq Mean Sq F value Pr(&gt;F)
+## Observer   1  0.013 0.01285   0.193  0.662
+## Residuals 88  5.866 0.06666               
+## 
+## Error: Subject:Task
+##               Df Sum Sq  Mean Sq F value Pr(&gt;F)
+## Task           1 0.0010 0.000965   0.061  0.806
+## Observer:Task  1 0.0102 0.010188   0.643  0.425
+## Residuals     88 1.3951 0.015853</code></pre>
+<pre><code>##            Effect PartialEtaSquared
+## 1        Observer             0.002
+## 2            Task             0.001
+## 3 Observer x Task             0.007</code></pre>
 <p><strong>PDP-A estimates:</strong></p>
-<table>
-<thead>
-<tr class="header">
-<th></th>
-<th align="right">Estimate</th>
-<th align="right">Std. Error</th>
-<th align="right">t value</th>
-<th align="right">Pr(&gt;|t|)</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td>(Intercept)</td>
-<td align="right">-0.0009621</td>
-<td align="right">0.0229644</td>
-<td align="right">-0.0418945</td>
-<td align="right">0.9666303</td>
-</tr>
-<tr class="even">
-<td>ObserverPresent</td>
-<td align="right">0.0092811</td>
-<td align="right">0.0324766</td>
-<td align="right">0.2857762</td>
-<td align="right">0.7753856</td>
-</tr>
-<tr class="odd">
-<td>TaskWIT</td>
-<td align="right">0.0209177</td>
-<td align="right">0.0324766</td>
-<td align="right">0.6440846</td>
-<td align="right">0.5203590</td>
-</tr>
-<tr class="even">
-<td>ObserverPresent:TaskWIT</td>
-<td align="right">-0.0496932</td>
-<td align="right">0.0459289</td>
-<td align="right">-1.0819590</td>
-<td align="right">0.2807509</td>
-</tr>
-</tbody>
-</table>
+<pre><code>## 
+## Error: Subject
+##           Df Sum Sq Mean Sq F value Pr(&gt;F)
+## Observer   1 0.0109 0.01090   0.371  0.544
+## Residuals 88 2.5838 0.02936               
+## 
+## Error: Subject:Task
+##               Df Sum Sq  Mean Sq F value Pr(&gt;F)
+## Task           1 0.0007 0.000695   0.038  0.845
+## Observer:Task  1 0.0278 0.027781   1.535  0.219
+## Residuals     88 1.5929 0.018102</code></pre>
+<pre><code>##            Effect PartialEtaSquared
+## 1        Observer             0.004
+## 2            Task             0.000
+## 3 Observer x Task             0.017</code></pre>
 <p><strong>Error-related distress:</strong></p>
-<table>
-<thead>
-<tr class="header">
-<th></th>
-<th align="right">Estimate</th>
-<th align="right">Std. Error</th>
-<th align="right">t value</th>
-<th align="right">Pr(&gt;|t|)</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td>(Intercept)</td>
-<td align="right">4.8740741</td>
-<td align="right">0.1835653</td>
-<td align="right">26.5522619</td>
-<td align="right">0.0000000</td>
-</tr>
-<tr class="even">
-<td>ObserverPresent</td>
-<td align="right">-0.0592593</td>
-<td align="right">0.2596005</td>
-<td align="right">-0.2282709</td>
-<td align="right">0.8197006</td>
-</tr>
-<tr class="odd">
-<td>TaskWIT</td>
-<td align="right">-0.0148148</td>
-<td align="right">0.2596005</td>
-<td align="right">-0.0570677</td>
-<td align="right">0.9545560</td>
-</tr>
-<tr class="even">
-<td>ObserverPresent:TaskWIT</td>
-<td align="right">0.0444444</td>
-<td align="right">0.3671306</td>
-<td align="right">0.1210589</td>
-<td align="right">0.9037824</td>
-</tr>
-</tbody>
-</table>
+<pre><code>## 
+## Error: Subject
+##           Df Sum Sq Mean Sq F value Pr(&gt;F)
+## Observer   1   0.06  0.0617   0.024  0.877
+## Residuals 88 224.45  2.5506               
+## 
+## Error: Subject:Task
+##               Df Sum Sq Mean Sq F value Pr(&gt;F)
+## Task           1   0.00  0.0025   0.005  0.943
+## Observer:Task  1   0.02  0.0222   0.046  0.830
+## Residuals     88  42.42  0.4820</code></pre>
+<pre><code>##            Effect PartialEtaSquared
+## 1        Observer                 0
+## 2            Task                 0
+## 3 Observer x Task                 0</code></pre>
 </div>
 <div id="study-2-3" class="section level4">
 <h4>Study 2:</h4>
 <p><strong>Perf bias:</strong></p>
-<table>
-<thead>
-<tr class="header">
-<th></th>
-<th align="right">Estimate</th>
-<th align="right">Std. Error</th>
-<th align="right">t value</th>
-<th align="right">Pr(&gt;|t|)</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td>(Intercept)</td>
-<td align="right">0.0608333</td>
-<td align="right">0.0129125</td>
-<td align="right">4.711198</td>
-<td align="right">0.0000035</td>
-</tr>
-<tr class="even">
-<td>ObserverPresent</td>
-<td align="right">0.0278763</td>
-<td align="right">0.0186015</td>
-<td align="right">1.498609</td>
-<td align="right">0.1348010</td>
-</tr>
-<tr class="odd">
-<td>TaskWIT</td>
-<td align="right">0.0383333</td>
-<td align="right">0.0182610</td>
-<td align="right">2.099188</td>
-<td align="right">0.0364561</td>
-</tr>
-<tr class="even">
-<td>ObserverPresent:TaskWIT</td>
-<td align="right">-0.0412455</td>
-<td align="right">0.0263065</td>
-<td align="right">-1.567885</td>
-<td align="right">0.1177358</td>
-</tr>
-</tbody>
-</table>
+<pre><code>## 
+## Error: Subject
+##            Df Sum Sq  Mean Sq F value Pr(&gt;F)
+## Observer    1  0.005 0.005071   0.216  0.643
+## Residuals 191  4.481 0.023462               
+## 
+## Error: Subject:Task
+##                Df Sum Sq Mean Sq F value Pr(&gt;F)  
+## Task            1 0.0329 0.03288   3.326 0.0697 .
+## Observer:Task   1 0.0410 0.04099   4.147 0.0431 *
+## Residuals     191 1.8879 0.00988                 
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
+<pre><code>##            Effect PartialEtaSquared
+## 1        Observer             0.001
+## 2            Task             0.017
+## 3 Observer x Task             0.021</code></pre>
 <p><strong>PDP-C estimates:</strong></p>
-<table>
-<thead>
-<tr class="header">
-<th></th>
-<th align="right">Estimate</th>
-<th align="right">Std. Error</th>
-<th align="right">t value</th>
-<th align="right">Pr(&gt;|t|)</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td>(Intercept)</td>
-<td align="right">0.3314583</td>
-<td align="right">0.0231919</td>
-<td align="right">14.2920130</td>
-<td align="right">0.0000000</td>
-</tr>
-<tr class="even">
-<td>ObserverPresent</td>
-<td align="right">0.0131877</td>
-<td align="right">0.0334097</td>
-<td align="right">0.3947273</td>
-<td align="right">0.6932645</td>
-</tr>
-<tr class="odd">
-<td>TaskWIT</td>
-<td align="right">0.0634375</td>
-<td align="right">0.0327982</td>
-<td align="right">1.9341739</td>
-<td align="right">0.0538300</td>
-</tr>
-<tr class="even">
-<td>ObserverPresent:TaskWIT</td>
-<td align="right">0.0165356</td>
-<td align="right">0.0472485</td>
-<td align="right">0.3499715</td>
-<td align="right">0.7265529</td>
-</tr>
-</tbody>
-</table>
+<pre><code>## 
+## Error: Subject
+##            Df Sum Sq Mean Sq F value Pr(&gt;F)
+## Observer    1  0.044 0.04436     0.5   0.48
+## Residuals 191 16.957 0.08878               
+## 
+## Error: Subject:Task
+##                Df Sum Sq Mean Sq F value   Pr(&gt;F)    
+## Task            1  0.492  0.4920  26.185 7.53e-07 ***
+## Observer:Task   1  0.007  0.0066   0.351    0.554    
+## Residuals     191  3.589  0.0188                     
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
+<pre><code>##            Effect PartialEtaSquared
+## 1        Observer             0.003
+## 2            Task             0.121
+## 3 Observer x Task             0.002</code></pre>
 <p><strong>PDP-A estimates:</strong></p>
-<table>
-<thead>
-<tr class="header">
-<th></th>
-<th align="right">Estimate</th>
-<th align="right">Std. Error</th>
-<th align="right">t value</th>
-<th align="right">Pr(&gt;|t|)</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td>(Intercept)</td>
-<td align="right">0.0133104</td>
-<td align="right">0.0155891</td>
-<td align="right">0.8538266</td>
-<td align="right">0.3937362</td>
-</tr>
-<tr class="even">
-<td>ObserverPresent</td>
-<td align="right">-0.0275288</td>
-<td align="right">0.0224573</td>
-<td align="right">-1.2258272</td>
-<td align="right">0.2210189</td>
-</tr>
-<tr class="odd">
-<td>TaskWIT</td>
-<td align="right">-0.0035557</td>
-<td align="right">0.0220463</td>
-<td align="right">-0.1612837</td>
-<td align="right">0.8719552</td>
-</tr>
-<tr class="even">
-<td>ObserverPresent:TaskWIT</td>
-<td align="right">0.0109652</td>
-<td align="right">0.0317595</td>
-<td align="right">0.3452585</td>
-<td align="right">0.7300901</td>
-</tr>
-</tbody>
-</table>
+<pre><code>## 
+## Error: Subject
+##            Df Sum Sq Mean Sq F value Pr(&gt;F)
+## Observer    1  0.047 0.04684   1.541  0.216
+## Residuals 191  5.804 0.03039               
+## 
+## Error: Subject:Task
+##                Df Sum Sq  Mean Sq F value Pr(&gt;F)
+## Task            1  0.000 0.000288   0.016  0.900
+## Observer:Task   1  0.003 0.002897   0.159  0.691
+## Residuals     191  3.480 0.018217</code></pre>
+<pre><code>##            Effect PartialEtaSquared
+## 1        Observer             0.008
+## 2            Task             0.000
+## 3 Observer x Task             0.001</code></pre>
 <p><strong>Anxiety composite:</strong></p>
-<table>
-<thead>
-<tr class="header">
-<th></th>
-<th align="right">Estimate</th>
-<th align="right">Std. Error</th>
-<th align="right">t value</th>
-<th align="right">Pr(&gt;|t|)</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td>(Intercept)</td>
-<td align="right">0.0089070</td>
-<td align="right">0.0762495</td>
-<td align="right">0.1168137</td>
-<td align="right">0.9070691</td>
-</tr>
-<tr class="even">
-<td>ObserverPresent</td>
-<td align="right">0.0361963</td>
-<td align="right">0.1098434</td>
-<td align="right">0.3295261</td>
-<td align="right">0.7419387</td>
-</tr>
-<tr class="odd">
-<td>TaskWIT</td>
-<td align="right">-0.0362354</td>
-<td align="right">0.1078330</td>
-<td align="right">-0.3360329</td>
-<td align="right">0.7370306</td>
-</tr>
-<tr class="even">
-<td>ObserverPresent:TaskWIT</td>
-<td align="right">-0.0320433</td>
-<td align="right">0.1553420</td>
-<td align="right">-0.2062755</td>
-<td align="right">0.8366856</td>
-</tr>
-</tbody>
-</table>
+<pre><code>## 
+## Error: Subject
+##            Df Sum Sq Mean Sq F value Pr(&gt;F)
+## Observer    1   0.04  0.0392   0.037  0.849
+## Residuals 191 204.96  1.0731               
+## 
+## Error: Subject:Task
+##                Df Sum Sq Mean Sq F value Pr(&gt;F)  
+## Task            1  0.258 0.25769   2.873 0.0917 .
+## Observer:Task   1  0.025 0.02474   0.276 0.6001  
+## Residuals     191 17.130 0.08968                 
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
+<pre><code>##            Effect PartialEtaSquared
+## 1        Observer             0.000
+## 2            Task             0.015
+## 3 Observer x Task             0.001</code></pre>
 </div>
 </div>
 <div id="look-at-relationship-between-anxiety-and-pdp-apdp-c" class="section level3">
