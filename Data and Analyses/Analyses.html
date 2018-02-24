@@ -517,6 +517,67 @@ $(document).ready(function () {
 ## 1        Observer             0.000
 ## 2            Task             0.015
 ## 3 Observer x Task             0.001</code></pre>
+<p><strong>Moderation of observer effect by anxiety:</strong> Uses a multiple regression because of continuous nature of anxiety.</p>
+<pre><code>## 
+## Call:
+## lm(formula = perfBias ~ Observer * Anx_composite, data = s2.wide)
+## 
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -0.49176 -0.08266 -0.00914  0.06813  0.58119 
+## 
+## Coefficients:
+##                               Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)                    0.08019    0.00901   8.899   &lt;2e-16 ***
+## ObserverPresent                0.00660    0.01298   0.508   0.6114    
+## Anx_composite                  0.02019    0.01185   1.704   0.0892 .  
+## ObserverPresent:Anx_composite  0.02245    0.01710   1.313   0.1901    
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 0.1274 on 382 degrees of freedom
+## Multiple R-squared:  0.0382, Adjusted R-squared:  0.03065 
+## F-statistic: 5.057 on 3 and 382 DF,  p-value: 0.001906</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = MeanC ~ Observer * Anx_composite, data = s2.wide)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -0.5280 -0.1702  0.0134  0.1813  0.4705 
+## 
+## Coefficients:
+##                               Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)                    0.36266    0.01624  22.330  &lt; 2e-16 ***
+## ObserverPresent                0.02275    0.02340   0.972  0.33156    
+## Anx_composite                 -0.05607    0.02136  -2.625  0.00901 ** 
+## ObserverPresent:Anx_composite -0.01457    0.03083  -0.473  0.63682    
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 0.2297 on 382 degrees of freedom
+## Multiple R-squared:  0.0446, Adjusted R-squared:  0.0371 
+## F-statistic: 5.944 on 3 and 382 DF,  p-value: 0.0005707</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = AResid ~ Observer * Anx_composite, data = s2.wide)
+## 
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -0.35026 -0.11287 -0.01055  0.09233  0.49791 
+## 
+## Coefficients:
+##                                Estimate Std. Error t value Pr(&gt;|t|)  
+## (Intercept)                    0.011805   0.010921   1.081    0.280  
+## ObserverPresent               -0.022609   0.015733  -1.437    0.152  
+## Anx_composite                  0.029597   0.014363   2.061    0.040 *
+## ObserverPresent:Anx_composite -0.003161   0.020729  -0.153    0.879  
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 0.1544 on 382 degrees of freedom
+## Multiple R-squared:  0.02386,    Adjusted R-squared:  0.0162 
+## F-statistic: 3.113 on 3 and 382 DF,  p-value: 0.02629</code></pre>
 </div>
 </div>
 <div id="look-at-relationship-between-anxiety-and-pdp-apdp-c" class="section level3">
