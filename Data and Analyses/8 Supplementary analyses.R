@@ -198,3 +198,24 @@ ggplot(compareAC, aes(WITestimate, APTestimate, pch = Type)) +
 ggsave("./Figures/CompareAdiffC_SM_Study2.tiff")
 
 lm(WITestimate ~ APTestimate*Type, data = compareAC) %>% summary()
+
+
+# Effect of Observer
+# Study 1
+s1.test = select(s1.widePDP, Subject, Observer, contains("DiffA.stand")) %>% 
+  gather(Task, DiffA, 3:4)
+s1.test$Subject = factor(s1.test$Subject)
+s1.test$Task = factor(s1.test$Task)
+
+aov(DiffA ~ Observer*Task + Error(Subject/(Task)), data = s1.test) %>% 
+  summary()
+
+# Study 2
+# Study 1
+s2.test = select(s2.widePDP, Subject, Observer, contains("DiffA.stand")) %>% 
+  gather(Task, DiffA, 3:4)
+s2.test$Subject = factor(s2.test$Subject)
+s2.test$Task = factor(s2.test$Task)
+
+aov(DiffA ~ Observer*Task + Error(Subject/(Task)), data = s2.test) %>% 
+  summary()

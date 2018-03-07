@@ -643,6 +643,11 @@ m8 = aov(Anx_composite ~ Observer*Task + Error(Subject/(Task)), data = s2.wide) 
 m8.es = data.frame(Effect = c("Observer", "Task", "Observer x Task"),
                    PartialEtaSquared = round(c(.04/(.04+205), .258/(.258+17.1), .025/(.025+17.1)), digits = 3))
 
+m8.a = aov(Anx_composite ~ Observer, data = filter(s2.wide, Task == "WIT")) %>% 
+  summary()
+
+m8.b = aov(Anx_composite ~ Observer, data = filter(s2.wide, Task == "APT")) %>% 
+  summary()
 
 ```
 
