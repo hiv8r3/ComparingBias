@@ -499,6 +499,30 @@ lm(scale(AResid) ~ scale(IMS), data = s1.wide[s1.wide$Observer == "Present" & s1
   summary()
 lm(scale(AResid) ~ scale(IMS), data = s1.wide[s1.wide$Observer == "Present" & s1.wide$Task == "WIT",]) %>%
   summary()
+
+# Plot 3-way Observer x IMS x Task interaction on PDP-A
+ggplot(s1.wide, aes(IMS, AResid, pch = Task)) +
+  geom_point(aes(shape = Task), size = 2.5, alpha = .7) +
+  facet_wrap(~Observer) +
+  scale_shape_manual(values=c(1,17)) +
+  scale_linetype_manual(values=c("solid", "dashed")) +
+  theme_bw() +
+  geom_smooth(method = "lm", aes(linetype=Task), color = "black") +
+  labs(x = "Internal motivation (IMS)", y = "PDP-Auto estimate") +
+  theme(panel.grid.major = element_line(color = "white"),
+        panel.grid.minor = element_line(color = "white"),
+        legend.title = element_blank(),
+        legend.key.size = unit(1.2, "cm"),
+        axis.title.x = element_text(size=20),
+        axis.title.y = element_text(size=20),
+        axis.text.x = element_text(size=16),
+        axis.text.y = element_text(size=16),
+        strip.text.x = element_text(size = 16)) +
+  coord_cartesian(ylim=c(-.5,.5))
+
+ggsave("./Figures/3way-PDPAuto_Study1.tiff", width = 9, height = 5)
+
+
 ```
 
 ####Study 2:  
@@ -565,6 +589,29 @@ m6
   
 ``` {r}
 m7
+
+# Plot 3-way Observer x IMS x Task interaction on PDP-A
+ggplot(s2.wide, aes(IMS, AResid, pch = Task)) +
+  geom_point(aes(shape = Task), size = 2.5, alpha = .7) +
+  facet_wrap(~Observer) +
+  scale_shape_manual(values=c(1,17)) +
+  scale_linetype_manual(values=c("solid", "dashed")) +
+  theme_bw() +
+  geom_smooth(method = "lm", aes(linetype=Task), color = "black") +
+  labs(x = "Internal motivation (IMS)", y = "PDP-Auto estimate") +
+  theme(panel.grid.major = element_line(color = "white"),
+        panel.grid.minor = element_line(color = "white"),
+        legend.title = element_blank(),
+        legend.key.size = unit(1.2, "cm"),
+        axis.title.x = element_text(size=20),
+        axis.title.y = element_text(size=20),
+        axis.text.x = element_text(size=16),
+        axis.text.y = element_text(size=16),
+        strip.text.x = element_text(size = 16)) +
+  coord_cartesian(ylim=c(-.5,.5))
+
+ggsave("./Figures/3way-PDPAuto_Study2.tiff", width = 9, height = 5)
+
 ```
 
 
