@@ -1,0 +1,8 @@
+"Subject"	"Reason"
+7	"< 2 SDs below mean"
+19	"< 2 SDs below mean"
+31	"< 2 SDs below mean"
+51	"< 2 SDs below mean"
+158	"< 2 SDs below mean"
+9	"Used one response button more than 85% of the time"
+1	"Computer malfunction"

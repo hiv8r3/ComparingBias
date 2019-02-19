@@ -53,7 +53,15 @@ dat.select = select(dat,
 # select experimental trials (minus practice and questions)
 expTrials = dat.select[dat.select$blockName == "WIT"|dat.select$blockName == "AP",]
 
-# adds MTCP scores
+# check to make sure all subjects have the right number of trials
+frame = data.frame(Subject = NULL, nTrials = NULL)
+for (i in unique(expTrials$Subject)) {
+  a = nrow(expTrials[expTrials$Subject == i,])
+  temp = data.frame(Subject = i, nTrials = a)
+  frame = rbind(frame, temp)
+}
+
+# adds IMS/EMS scores
 MTCP = read.delim("./Data/Study I/MTCPscores.txt")
 # includes 5 subjects added after semester was over: 37, 45, 70, 73, 85
 
@@ -67,16 +75,11 @@ MTCP = mutate(MTCP, EMS = (MTCP$EMS_1 + MTCP$EMS_2 + MTCP$EMS_3 + MTCP$EMS_4 + M
 MTCP$EMS[MTCP$Subject == 15] = 1.8
 MTCP$IMS[MTCP$Subject == 59] = 2.3
 
-# Make IMS-EMS diff score
-MTCP = mutate(MTCP, IMS.EMS.diff = IMS - EMS)
-
-
+# add IMS/EMS scores to trial data
 for (i in unique(expTrials$Subject)) {
   expTrials$IMS[expTrials$Subject == i] = MTCP$IMS[MTCP$Subject == i]
   expTrials$EMS[expTrials$Subject == i] = MTCP$EMS[MTCP$Subject == i]
-  expTrials$IMS.EMS.diff[expTrials$Subject == i] = MTCP$IMS.EMS.diff[MTCP$Subject == i]
 }
-
 
 # add observer status
 obs = read.delim("./Data/Study I/ConditionList.txt", stringsAsFactors=F)
@@ -85,8 +88,6 @@ expTrials$Observer = NULL
 for (i in unique(expTrials$Subject)) {
   expTrials$Observer[expTrials$Subject == i] = obs$ObsCond[i]
 }
-# In WIT: 92 Ss total (47 absent, 45 present)
-# In AP: 93 Ss total (47 absent, 46 present)
 
 # Add column for congruence
 
@@ -103,15 +104,56 @@ expTrials$Congruence[expTrials$PrimeType == "white" & expTrials$TargetType == "p
 
 write.table(expTrials, file = "Study1_experimentalTrials.txt", sep = "\t", row.names = F)
 
+# missing sub 53
 
+# Separate task questions (Study 1) -------------------------------------------------
 
-# Select question data for each task
+# Select question data for each task 
+
+# Each item is under "SubTrial
+# 1.	How frustrated were you by your errors?
+# 2.	How anxious did your errors make you?
+# 3.	How unpleasant were your errors?
+# 4.	In general, how attentive were you during the task?
+# 5.	In general, how hard did you try during the task?
 
 questDat = dat.select[dat.select$blockName == "PostWITquestions"|dat.select$blockName == "PostAPquestions",] %>%
   select(c(Subject, SubTrial, errorQSlide.RESP, blockName))
 
-write.table(questDat, file = "Study1_questDat.txt", sep = "\t", row.names = F)
+# make wide
+wide.questDat = spread(questDat, SubTrial, errorQSlide.RESP)
 
+# rename variables
+# rename variables
+names(wide.questDat) = c("Subject", "blockName", 
+                     "Frust", 
+                     "Anx", 
+                     "Unpleas", 
+                     "Attent", 
+                     "Effort")
+
+# create composite
+# since questions are on different scales, standardize first
+wide.questDat$Composite = (scale(wide.questDat$Frust) + 
+                             scale(wide.questDat$Anx) + 
+                             scale(wide.questDat$Unpleas))/3
+
+write.table(wide.questDat, file = "Study1_questDat.txt", sep = "\t", row.names = F)
+
+
+# Cronbach alphas for anx composite ----------------------------
+
+APTcomp = wide.questDat[wide.questDat$blockName == "PostAPquestions",] %>% 
+  select(Frust, Anx, Unpleas)
+
+APTcomp = wide.questDat[wide.questDat$blockName == "PostWITquestions",] %>% 
+  select(Frust, Anx, Unpleas)
+
+require(psych)
+alpha(APTcomp)
+alpha(WITcomp)
+
+write.table(questDat, file = "Study1_questDat.txt", sep = "\t", row.names = F)
 
 # Study II ----------------------------------------------------------------
 
@@ -186,7 +228,7 @@ dat.select = select(dat.all,
                     anxQSlide.RESP)
 
 
-# Separate experimental trials --------------------------------------------
+# Separate experimental trials 
 
 expBlocks = c("APT_1", "APT_2", "WIT_1", "WIT_2")
 # select experimental trials (minus practice and questions)
@@ -205,13 +247,12 @@ length(unique(expTrials$Subject))
 
 
 # add IMS/EMS data
-# read in Qualtrics data --------------------------------------------------
+# read in Qualtrics data 
 
 qualDat = read.delim("./Data/Study II/QualtricsData.txt", stringsAsFactors = F)
 qualDat = qualDat[order(qualDat$Subject),]
 
-# Calc IMS/EMS scores -----------------------------------------------------
-
+# Calc IMS/EMS scores 
 # reverse score IMS_1
 qualDat$IMS_1.rev = 10 - qualDat$IMS_1
 
@@ -219,11 +260,8 @@ qualDat$IMS_1.rev = 10 - qualDat$IMS_1
 qualDat = mutate(qualDat, IMS = (qualDat$IMS_1.rev + qualDat$IMS_2 + qualDat$IMS_3 + qualDat$IMS_4 + qualDat$IMS_5)/5)
 qualDat = mutate(qualDat, EMS = (qualDat$EMS_1 + qualDat$EMS_2 + qualDat$EMS_3 + qualDat$EMS_4 + qualDat$EMS_5)/5)
 
-# Make IMS-EMS diff score
-qualDat = mutate(qualDat, IMS.EMS.diff = IMS - EMS)
 
-
-# Calc social anxiety scores ----------------------------------------------
+# Calc social anxiety scores 
 
 # reverse score SA_3
 qualDat$SA_3.rev = 7 - qualDat$SA_3
@@ -236,7 +274,6 @@ qualDat2 = select(qualDat, Subject,
                   IMS_1.rev, IMS_2, IMS_3, IMS_4, IMS_5,
                   EMS_1, EMS_2, EMS_3, EMS_4, EMS_5,
                   SA_1, SA_2, SA_3.rev, SA_4, SA_5,
-                  IMS.EMS.diff,
                   IMS,
                   EMS,
                   SA)
@@ -258,11 +295,10 @@ qualDat2$SA[qualDat2$Subject == 195] = mean(as.numeric(qualDat2[qualDat$Subject 
 for (i in unique(expTrials$Subject)) {
   expTrials$IMS[expTrials$Subject == i] = qualDat2$IMS[qualDat2$Subject == i]
   expTrials$EMS[expTrials$Subject == i] = qualDat2$EMS[qualDat2$Subject == i]
-  expTrials$IMS.EMS.diff[expTrials$Subject == i] = qualDat2$IMS.EMS.diff[qualDat2$Subject == i]
   expTrials$SA[expTrials$Subject == i] = qualDat2$SA[qualDat2$Subject == i]
 }
 
-# Add observer status, experimenter info ----------------------------------
+# Add observer status, experimenter info 
 
 paperDat = read.delim("./Data/Study II/PaperData.txt", stringsAsFactors = F)
 
@@ -289,16 +325,8 @@ for (i in unique(expTrials$Subject)) {
   expTrials$Intro[expTrials$Subject == i] = paperDat$Intro[paperDat$Subject == i]
 }
 
-# check how many subjects in each observer condition, with each task
-length(unique(expTrials$Subject[expTrials$Procedure.Block. == "WITproc"]))
-length(unique(expTrials$Subject[expTrials$Observer == "Present" &
-                                      expTrials$Procedure.Block. == "WITproc"]))
 
-# In APT, 198 Ss total (97 present, 101 absent)
-# In WIT, 199 Ss total (97 present, 102 absent)
-
-
-# Add column for congruence -----------------------------------------------
+# Add column for congruence
 
 expTrials$Congruence[expTrials$PrimeType == "black" & expTrials$TargetType == "weapon"] = "congruent"
 expTrials$Congruence[expTrials$PrimeType == "black" & expTrials$TargetType == "tool"] = "incongruent"
@@ -314,7 +342,8 @@ expTrials$Congruence[expTrials$PrimeType == "white" & expTrials$TargetType == "p
 write.table(expTrials, file = "Study2_experimentalTrials.txt", sep = "\t", row.names = F)
 
 
-# Separate task questions -------------------------------------------------
+
+# Separate task questions (Study 2) -------------------------------------------------
 
 # Rate your agreement with each statement from 1 (Strongly agree) to 6 (Strongly disagree):
 # •	I feel a little self-conscious in this task.
@@ -379,7 +408,8 @@ qplot(x=Var1, y=Var2, data=melt(cor(questWide[!(questWide$Subject == 87),c(3:17)
 # reverse score "good"
 questWide$Good.rev = 8 - questWide$Good
 
-######## do exploratory factor analysis ###############
+# exploratory factor analysis
+
 efaDat = questWide[!(questWide$Subject == 87),c(3:6, 8:18)]
 
 # entering raw data and extracting 3 factors, 
@@ -395,7 +425,8 @@ ggplot(load, aes(Factor1, Factor2, label = Item)) +
   geom_point() +
   geom_text(hjust = -.1) 
 
-######## create composite for anxiety questions ###############
+# create anxiety composite
+
 # since questions are on different scales, standardize first
 questWide$Anx_composite = (scale(questWide$SelfConscious) + 
                               scale(questWide$Worried) + 
@@ -411,6 +442,11 @@ questWide$Anx_composite = (scale(questWide$SelfConscious) +
 
 write.table(questWide, file = "Study2_questDat.txt", sep = "\t", row.names = F)
 
+
+# Cronbach alphas for anx composite ----------------------------
+
+questWide = read.delim("Study2_questDat.txt")
+
 questWide$blockName = as.character(questWide$blockName)
 APTcomp = select(questWide, -Anx_composite) %>% 
   filter(blockName == "APT_Qs_1"|blockName == "APT_Qs_2") %>% 
@@ -423,3 +459,13 @@ WITcomp = select(questWide, -Anx_composite) %>%
 require(psych)
 alpha(APTcomp)
 alpha(WITcomp)
+
+
+
+
+
+
+
+
+
+

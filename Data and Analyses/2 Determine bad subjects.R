@@ -1,7 +1,5 @@
 # look at mean RT, num of errors for each subject
 require(dplyr)
-require(magrittr)
-
 
 # Study I -----------------------------------------------------------------
 
@@ -65,7 +63,7 @@ badSubsWIT = data.frame( "Subject" = integer(), "Reason" = character(), stringsA
                    "Reason2" = "")) %>%
   rbind(data.frame("Subject" = 4,
                    "Reason" = ">2 sds below mean",
-                   "Reason2" = "")) %>%
+                   "Reason2" = "Only used gun response")) %>%
   rbind(data.frame("Subject" = 28,
                    "Reason" = ">2 sds below mean",
                    "Reason2" = "Mixed up buttons")) %>%
@@ -240,7 +238,7 @@ write.table(badSubsAP, file = "Study2_badSubsAP.txt", sep = "\t", row.names = F)
 
 
 
-# determine gender and race breakdown of sample
+# Determine gender and race breakdown of sample ---------------
 temp = dat[dat$SubTrial == 1 & dat$blockName == "WIT_1",]
 
 unique(temp$Subject[temp$DemoGender.RESP == 1]) # includes NA
@@ -277,3 +275,4 @@ length(unique(temp$Subject[temp$DemoRace.RESP == 7])) # 2 unknown/choose not to 
 
 unique(temp$Subject[temp$DemoEthnicity.RESP == 1]) # includes NA
 length(unique(temp$Subject[temp$DemoEthnicity.RESP == 1])) # 9 hispanic
+
