@@ -48,11 +48,11 @@ for (i in unique(accRateWIT$Subject)) {
   pdpWIT = rbind(pdpWIT,
                  data.frame(Subject = i,
                             Task = "WIT",
-                            C_black = round(C_black, digits = 2),
-                            A_black = round(A_gun_black, digits = 2),
-                            C_white = round(C_white, digits = 2),
-                            A_gun_white = round(A_gun_white, digits = 2),
-                            A_tool_white = round(A_tool_white, digits = 2)))
+                            C_black = C_black,
+                            A_black = A_gun_black,
+                            C_white = C_white,
+                            A_gun_white = A_gun_white,
+                            A_tool_white = A_tool_white))
 }
 
 # # display Ps with negative control estimates
@@ -65,11 +65,9 @@ for (i in unique(accRateWIT$Subject)) {
 # Create A resid scores for WIT -------------------------------------------
 
 model1 = lm(A_black ~ A_tool_white, data = pdpWIT)
-pdpWIT$AResid = round(model1$residuals, digits = 2) # how it was done in original submission (Black-gun association, accounting for White-tool association)
+pdpWIT$AResid = model1$residuals # how it was done in original submission (Black-gun association, accounting for White-tool association)
 
 # since A_gun_white and A_tool_white are inverses of each other, residual is equivalent whether White-gun or White-tool association is used
-
-
 
 # Replace negative C estimates with 0 -------------------------------------
 
@@ -119,12 +117,12 @@ for (i in unique(accRateAPT$Subject)) {
   pdpAPT = rbind(pdpAPT,
                  data.frame(Subject = i,
                             Task = "APT",
-                            C_black = round(C_black, digits = 2),
-                            A_neg_black = round(A_neg_black, digits = 2),
-                            A_pos_black = round(A_pos_black, digits = 2),
-                            C_white = round(C_white, digits = 2),
-                            A_neg_white = round(A_neg_white, digits = 2),
-                            A_pos_white = round(A_pos_white, digits = 2)))
+                            C_black = C_black,
+                            A_neg_black = A_neg_black,
+                            A_pos_black = A_pos_black,
+                            C_white = C_white,
+                            A_neg_white = A_neg_white,
+                            A_pos_white = A_pos_white))
 }
 
 pdpAPT[pdpAPT$C_black < 0,] #10 subs have c estimates < 0
@@ -141,7 +139,7 @@ accRateAPT = select(filter(dat, blockName == "AP"), Subject, TrialType, TargetAP
 # Create A resid scores for APT -------------------------------------------
 
 model3 = lm(A_neg_black ~ A_pos_white, data = pdpAPT)
-pdpAPT$AResid = round(model3$residuals, digits = 2) # how it was done in original submission (Black-neg association, accounting for White-pos association)
+pdpAPT$AResid = model3$residuals # how it was done in original submission (Black-neg association, accounting for White-pos association)
 
 # Residuals are equivalent, regardless of which White association is used.
 # Residuals are inverted, depending on which Black association is used.
@@ -219,11 +217,11 @@ for (i in unique(accRateWIT$Subject)) {
   pdpWIT = rbind(pdpWIT,
                  data.frame(Subject = i,
                             Task = "WIT",
-                            C_black = round(C_black, digits = 2),
-                            A_black = round(A_gun_black, digits = 2),
-                            C_white = round(C_white, digits = 2),
-                            A_gun_white = round(A_gun_white, digits = 2),
-                            A_tool_white = round(A_tool_white, digits = 2)))
+                            C_black = C_black,
+                            A_black = A_gun_black,
+                            C_white = C_white,
+                            A_gun_white = A_gun_white,
+                            A_tool_white = A_tool_white))
 }
 
 # # display Ps with negative control estimates
@@ -236,7 +234,7 @@ for (i in unique(accRateWIT$Subject)) {
 # Create A resid scores for WIT -------------------------------------------
 
 model1 = lm(A_black ~ A_tool_white, data = pdpWIT)
-pdpWIT$AResid = round(model1$residuals, digits = 2) # how it was done in original submission (Black-gun association, accounting for White-tool association)
+pdpWIT$AResid = model1$residuals # how it was done in original submission (Black-gun association, accounting for White-tool association)
 
 # since A_gun_white and A_tool_white are inverses of each other, residual is equivalent whether White-gun or White-tool association is used
 
@@ -287,12 +285,12 @@ for (i in unique(accRateAPT$Subject)) {
   pdpAPT = rbind(pdpAPT,
                  data.frame(Subject = i,
                             Task = "APT",
-                            C_black = round(C_black, digits = 2),
-                            A_neg_black = round(A_neg_black, digits = 2),
-                            A_pos_black = round(A_pos_black, digits = 2),
-                            C_white = round(C_white, digits = 2),
-                            A_neg_white = round(A_neg_white, digits = 2),
-                            A_pos_white = round(A_pos_white, digits = 2)))
+                            C_black = C_black,
+                            A_neg_black = A_neg_black,
+                            A_pos_black = A_pos_black,
+                            C_white = C_white,
+                            A_neg_white = A_neg_white,
+                            A_pos_white = A_pos_white))
 }
 # Sub 59 has perfect accuracy on black trials, so C estimates = 1
 # manually enter A estimates as 0
@@ -313,7 +311,7 @@ pdpAPT$A_pos_black[pdpAPT$Subject == 59] = 0
 # Create A resid scores for APT -------------------------------------------
 
 model3 = lm(A_neg_black ~ A_pos_white, data = pdpAPT)
-pdpAPT$AResid = round(model3$residuals, digits = 2) # how it was done in original submission (Black-neg association, accounting for White-pos association)
+pdpAPT$AResid = model3$residuals # how it was done in original submission (Black-neg association, accounting for White-pos association)
 
 # Residuals are equivalent, regardless of which White association is used.
 # Residuals are inverted, depending on which Black association is used.
