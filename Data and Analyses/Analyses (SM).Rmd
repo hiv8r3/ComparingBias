@@ -1,0 +1,643 @@
+---
+title: Observer analyses (Supplemental Material)
+author: Hannah, 2/19/2019
+output:
+  html_document:
+    highlight: pygments
+    theme: cerulean
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+options(width=140)
+require(dplyr)
+require(tidyr)
+require(ggplot2)
+require(lme4)
+require(lmerTest)
+require(knitr)
+require(reshape2)
+```
+## Includes analyses regarding observer, IMS, and EMS that are included in SM.
+
+# Haven't started
+
+### Original subject exclusions
+
+Data for Study 1 was collected in Fall 2015. Data for Study 2 was collected in Fall 2016.
+
+**In Study 1:**  
+- 101 subjects participated  
+- 8 subjects' AP data was discarded (see "Study1_badsubsAP.txt")  
+- 9 subjects' WIT data was discarded (see "Study1_badsubsWIT.txt")    
+*This left 93 subjects with AP data and 92 subjects with WIT data.*
+
+Additionally, IMS/EMS data is missing for subs 3, 27, 53, 82, 88, 89, 90, and 101. 
+
+**In Study 2:**  
+- 206 subjects participated  
+- 8 subjects' AP data was discarded (see "Study2_badsubsAP.txt")  
+- 7 subjects' WIT data was discarded (see "Study2_badsubsWIT.txt")  
+*This left 198 subjects with AP data and 199 subjects with WIT data.*
+
+Additionally, IMS/EMS data is missing for 111, 189, and 201.
+
+There were 48 trials for each condition in each task (192 trials total for each task). In Study 2, each task was split into two sections so that participants could answer anxiety questions in the middle and end of each task.
+
+```{r echo = FALSE}
+s1.acc = read.delim("Study1_accuracy.txt")
+
+# separate by task
+s1.acc.APT = s1.acc[s1.acc$Task == "APT",]
+s1.acc.WIT = s1.acc[s1.acc$Task == "WIT",]
+
+# remove bad subs
+s1.bs.APT = read.delim("Study1_badSubsAP.txt")
+s1.acc.APT = s1.acc.APT[!(s1.acc.APT$Subject %in% s1.bs.APT$Subject),]
+
+s1.bs.WIT = read.delim("Study1_badSubsWIT.txt")
+s1.acc.WIT = s1.acc.WIT[!(s1.acc.WIT$Subject %in% s1.bs.WIT$Subject),]
+
+s1.acc.APT$Subject = factor(s1.acc.APT$Subject)
+s1.acc.WIT$Subject = factor(s1.acc.WIT$Subject)
+
+```
+
+
+#### Study 2: 
+```{r echo = FALSE}
+s2.acc = read.delim("Study2_accuracy.txt")
+
+# separate by task
+s2.acc.APT = s2.acc[s2.acc$Task == "APT",]
+s2.acc.WIT = s2.acc[s2.acc$Task == "WIT",]
+
+# remove bad subs
+s2.bs.APT = read.delim("Study2_badSubsAP.txt")
+s2.acc.APT = s2.acc.APT[!(s2.acc.APT$Subject %in% s2.bs.APT$Subject),]
+
+s2.bs.WIT = read.delim("Study2_badSubsWIT.txt")
+s2.acc.WIT = s2.acc.WIT[!(s2.acc.WIT$Subject %in% s2.bs.WIT$Subject),]
+
+s2.acc.APT$Subject = factor(s2.acc.APT$Subject)
+s2.acc.WIT$Subject = factor(s2.acc.WIT$Subject)
+```
+``` {r echo=F, warning=F}
+s1.perfBias = read.delim("Study1_perfBias.txt")
+
+# take out bs for both APT and WIT
+s1.perfBias = s1.perfBias[!(s1.perfBias$Subject %in% s1.bs.APT$Subject),]
+s1.perfBias = s1.perfBias[!(s1.perfBias$Subject %in% s1.bs.WIT$Subject),]
+
+# standardize perfBias estimates (depends on who is included in the sample, so needs to be done after subs are excluded)
+s1.perfBias$WITStand = scale(s1.perfBias$WITperfBias)
+s1.perfBias$APStand = scale(s1.perfBias$APperfBias)
+
+```
+
+``` {r echo=F, warning=F}
+# Look just at subjects that have data for both tasks, otherwise throws error ("Error() model is singular")
+# Probably because some subjects don't have data across both levels of task
+s1.acc.nobs = s1.acc[!(s1.acc$Subject %in% s1.bs.WIT$Subject) & !(s1.acc$Subject %in% s1.bs.AP$Subject),]
+s1.acc.nobs$Subject = factor(s1.acc.nobs$Subject)
+
+```
+
+#### Study 2
+Excludes subjects that don't have data in both tasks (only includes sample of 195).  
+
+#### A. Correlation between performance bias scores on each task
+``` {r perfBias.s2, echo=F, warning=F}
+s2.perfBias = read.delim("Study2_perfBias.txt")
+
+# take out bs for both APT and WIT
+s2.perfBias = s2.perfBias[!(s2.perfBias$Subject %in% s2.bs.APT$Subject),]
+s2.perfBias = s2.perfBias[!(s2.perfBias$Subject %in% s2.bs.WIT$Subject),]
+
+# standardize perfBias estimates (depends on who is included in the sample, so needs to be done after subs are excluded)
+s2.perfBias$WITStand = scale(s2.perfBias$WITperfBias)
+s2.perfBias$APStand = scale(s2.perfBias$APperfBias)
+
+# Look at correlation between tasks
+ggplot(s2.perfBias, aes(APStand, WITStand)) +
+  geom_point() +
+  geom_smooth(method = "lm") + 
+  #  ggtitle("Correlation between accuracy on WIT and accuracy on AP") +
+  labs(x = "Stand. Performance bias on AP", y = "Stand. Performance bias on WIT") +
+  theme_bw()+
+  theme(axis.title.x = element_text(size=20),
+        axis.title.y = element_text(size=20),
+        title = element_text(size=20)
+        #axis.text.x  = element_text(angle=90, vjust=0.5, size=16)
+  )
+
+lm(APStand ~ WITStand, data = s2.perfBias) %>%
+  summary()
+```
+
+#### B. Examine 3 way Prime x Target x Task interaction  
+``` {r 3way.s2, echo=F, wanring=F}
+# Look just at subjects that have data for both tasks, otherwise throws error ("Error() model is singular")
+# Probably because some subjects don't have data across both levels of task
+s2.acc.nobs = s2.acc[!(s2.acc$Subject %in% s2.bs.WIT$Subject) & !(s2.acc$Subject %in% s2.bs.APT$Subject),]
+s2.acc.nobs$Subject = factor(s2.acc.nobs$Subject)
+
+# Total number of errors (looking at three-way interaction)
+facet_labels <- c(AP = "APT", WIT = "WIT")
+
+# Figure 1 ----------------------------------------------------------------
+ggplot(s2.acc.nobs, aes(PrimeType, Accuracy, fill = ConType)) +
+  stat_summary(fun.y = mean, geom = "bar", position = "dodge") +
+  stat_summary(fun.data = mean_cl_normal, geom = "errorbar", position = position_dodge(width=.9), width = .2) +
+  facet_wrap(~Task, labeller=labeller(Task = facet_labels)) + 
+  #  ggtitle("Total number of errors") +
+  labs(y = "Accuracy rate", x = "Race of Prime") +
+  scale_fill_manual(values=c("black","grey70"), guide = guide_legend(title = NULL)) +
+  theme_bw() +
+  theme(panel.grid.major = element_line(color = "white"),
+        panel.grid.minor = element_line(color = "white"),
+        strip.text.x = element_text(face = "bold", size = 14),
+        strip.background = element_rect(fill = "grey98"),
+        axis.text.x = element_text(size = 14),
+        axis.text.y = element_text(size = 14),
+        axis.title.x = element_text(size = 14),
+        axis.title.y = element_text(size = 14))
+
+ggsave("./Figures/Accuracy_Study2.tiff")
+
+
+# See if pattern of racial bias differs across two tasks- TOTAL ERRORS
+sum2 = aov(Accuracy ~ (PrimeType*ConType*Task)+Error(Subject/(PrimeType*ConType*Task)), data = s2.acc.nobs) %>%
+  summary()
+
+sum2$`Error: Subject:PrimeType:ConType:Task`
+
+```
+
+### 3. Correspondance in PDP estimates across tasks  
+Only includes data for participants with data in both tasks (N = 90).  
+
+####Study 1:  
+``` {r correl, echo=F}
+
+## CHANGES TO PDP ESTIMATE CALCULATION SINCE INTIIAL SUBMISSION:
+# 1. TOOK OUT MISS TRIALS (IE ONLY INCLUDED TRIALS IN WHICH A RESPONSE WAS RECORDED WITHIN THE TIME WINDOW)
+# 2. REPLACED NEGATIVE ESTIMATES WITH TRIALS
+
+# compare PDP-C estimates across tasks
+s1.PDP.APT = read.delim("Study1_pdpEstimates_APT.txt")
+s1.PDP.WIT = read.delim("Study1_pdpEstimates_WIT.txt")
+
+# take out subs with missing data
+s1.PDP.APT = s1.PDP.APT[!(s1.PDP.APT$Subject %in% s1.bs.WIT$Subject) & !(s1.PDP.APT$Subject %in% s1.bs.APT$Subject),]
+
+s1.PDP.WIT = s1.PDP.WIT[!(s1.PDP.WIT$Subject %in% s1.bs.WIT$Subject) & !(s1.PDP.WIT$Subject %in% s1.bs.APT$Subject),]
+
+# Add standarized estimates (depends on subjects included)
+s1.PDP.APT$Cmean.scale = scale(s1.PDP.APT$C_mean)
+s1.PDP.WIT$Cmean.scale = scale(s1.PDP.WIT$C_mean)
+s1.PDP.APT$AResid.scale = scale(s1.PDP.APT$AResid)
+s1.PDP.WIT$AResid.scale = scale(s1.PDP.WIT$AResid)
+
+# ## COMPARISON BETWEEN PDP ESTIMATES FROM INITIAL SUBMISSION AND CHANGED PDP ESTIMATES
+# s1.widePDP = read.delim("Old/Study1_PDP_wide.txt")
+# # APT C ESTIMATES: r = .97
+# cor(s1.widePDP$APT_MeanC, s1.PDP.APT$C_mean)
+# ggsave("./Compare new and old PDP est/Study1_APT_Cmean.jpg", 
+#        qplot(s1.widePDP$APT_MeanC, s1.PDP.APT$C_mean, 
+#              xlab = "Old PDP-C", ylab = "New PDP-C", main = "APT"))
+# # APT A ESTIMATES: r = .82
+# cor(s1.widePDP$APT_AResid, s1.PDP.APT$AResid)
+# ggsave("./Compare new and old PDP est/Study1_APT_AResid.jpg", 
+#        qplot(s1.widePDP$APT_AResid, s1.PDP.APT$AResid, 
+#              xlab = "Old PDP-A", ylab = "New PDP-A", main = "APT"))
+# # WIT C ESTIMATES: r = .97
+# cor(s1.widePDP$WIT_MeanC, s1.PDP.WIT$C_mean)
+# ggsave("./Compare new and old PDP est/Study1_WIT_Cmean.jpg", 
+#        qplot(s1.widePDP$WIT_MeanC, s1.PDP.WIT$C_mean, 
+#              xlab = "Old PDP-C", ylab = "New PDP-C", main = "WIT"))
+# # WIT A ESTIMATES: r = .67
+# cor(s1.widePDP$WIT_AResid, s1.PDP.WIT$AResid)
+# ggsave("./Compare new and old PDP est/Study1_WIT_AResid.jpg", 
+#        qplot(s1.widePDP$WIT_AResid, s1.PDP.WIT$AResid, 
+#              xlab = "Old PDP-A", ylab = "New PDP-A", main = "WIT"))
+
+# C estimates
+s1.Cest = 
+  cbind(rename(s1.PDP.APT, APT.Cmean.scale = Cmean.scale) %>% 
+        select(APT.Cmean.scale),
+      rename(s1.PDP.WIT, WIT.Cmean.scale = Cmean.scale) %>% 
+        select(WIT.Cmean.scale))
+
+ggplot(s1.Cest, aes(WIT.Cmean.scale, APT.Cmean.scale)) +
+  geom_point() +
+  geom_smooth(method = "lm") +
+  #  ggtitle("Correlation between accuracy on WIT and accuracy on AP") +
+  labs(x = "WIT PDP-C", y = "AP PDP-C") +
+  theme_bw()+
+  theme(axis.title.x = element_text(size=20),
+        axis.title.y = element_text(size=20),
+        title = element_text(size=20)
+        #axis.text.x  = element_text(angle=90, vjust=0.5, size=16)
+  )
+
+lm(WIT.Cmean.scale ~ APT.Cmean.scale, data = s1.Cest) %>% summary()
+
+# A estimates
+s1.Aest = 
+  cbind(rename(s1.PDP.APT, APT.AResid.scale = AResid.scale) %>% 
+        select(APT.AResid.scale),
+      rename(s1.PDP.WIT, WIT.AResid.scale = AResid.scale) %>% 
+        select(WIT.AResid.scale))
+
+ggplot(s1.Aest, aes(WIT.AResid.scale, APT.AResid.scale)) +
+  geom_point() +
+  geom_smooth(method = "lm") +
+  #  ggtitle("Correlation between accuracy on WIT and accuracy on AP") +
+  labs(x = "WIT PDP-A", y = "AP PDP-A") +
+  theme_bw()+
+  theme(axis.title.x = element_text(size=20),
+        axis.title.y = element_text(size=20),
+        title = element_text(size=20)
+        #axis.text.x  = element_text(angle=90, vjust=0.5, size=16)
+  )
+
+lm(WIT.AResid.scale ~ APT.AResid.scale, data = s1.Aest) %>% summary()
+
+
+# Compare C and A resid 
+s1.Aest$EstType = "A"
+names(s1.Aest) = c("APT", "WIT", "EstType")
+
+s1.Cest$Type = "C"
+names(s1.Cest) = c("APT", "WIT", "EstType")
+
+compareAC = rbind(s1.Aest, s1.Cest)
+
+ggplot(compareAC, aes(WIT, APT, pch = EstType)) +
+  geom_point(aes(shape = EstType), size = 2.5, alpha = .7) +
+  scale_shape_manual(values=c(1,17)) +
+  scale_linetype_manual(values=c("solid", "dashed")) +
+  theme_bw() +
+  geom_smooth(method = "lm", aes(linetype=EstType), color = "black", fullrange = T) +
+  labs(x = "PDP estimates for WIT", y = "PDP estimates for APT") +
+  theme(panel.grid.major = element_line(color = "white"),
+        panel.grid.minor = element_line(color = "white"),
+        legend.title = element_blank(),
+        legend.key.size = unit(1.2, "cm"),
+        axis.title.x = element_text(size=20),
+        axis.title.y = element_text(size=20),
+        axis.text.x = element_text(size=16),
+        axis.text.y = element_text(size=16))+
+  coord_cartesian(expand=c(0,0))
+
+ggsave("./Figures/Study1_CompareAC.tiff")
+
+lm(WIT ~ APT*EstType, data = compareAC) %>% summary()
+
+```
+``` {r, echo=F, eval=F}
+# run other models to get f^2 (measures local effect size)
+# f^2 = (R^2(full) - R^2(reduced))/(1-R^2(full))
+# where full has all predictors/interactions and reduced has all but the one you want the effect size for
+
+full = lm(WIT ~ APT*EstType, data = compareAC) %>% summary()
+reduced = lm(WIT ~ APT+EstType, data = compareAC) %>% summary() 
+
+(full$r.squared - reduced$r.squared)/(1-full$r.squared)
+
+```
+####Study 2:  
+``` {r correl2, echo=F}
+# compare PDP-C estimates across tasks
+s2.PDP.APT = read.delim("Study2_pdpEstimates_APT.txt")
+s2.PDP.WIT = read.delim("Study2_pdpEstimates_WIT.txt")
+
+# take out subs with missing data
+s2.PDP.APT = s2.PDP.APT[!(s2.PDP.APT$Subject %in% s2.bs.WIT$Subject) & !(s2.PDP.APT$Subject %in% s2.bs.APT$Subject),]
+
+s2.PDP.WIT = s2.PDP.WIT[!(s2.PDP.WIT$Subject %in% s2.bs.WIT$Subject) & !(s2.PDP.WIT$Subject %in% s2.bs.APT$Subject),]
+
+# Add standarized estimates (depends on subjects included)
+s2.PDP.APT$Cmean.scale = scale(s2.PDP.APT$C_mean)
+s2.PDP.WIT$Cmean.scale = scale(s2.PDP.WIT$C_mean)
+s2.PDP.APT$AResid.scale = scale(s2.PDP.APT$AResid)
+s2.PDP.WIT$AResid.scale = scale(s2.PDP.WIT$AResid)
+
+## COMPARISON BETWEEN PDP ESTIMATES FROM INITIAL SUBMISSION AND CHANGED PDP ESTIMATES
+s2.widePDP = read.delim("Old/Study2_PDP_wide.txt")
+# APT C ESTIMATES: r = .95
+cor(s2.widePDP$APT_MeanC, s2.PDP.APT$C_mean)
+ggsave("./Compare new and old PDP est/Study2_APT_Cmean.jpg",
+       qplot(s2.widePDP$APT_MeanC, s2.PDP.APT$C_mean,
+             xlab = "Old PDP-C", ylab = "New PDP-C", main = "APT"))
+# APT A ESTIMATES: r = .72
+cor(s2.widePDP$APT_AResid, s2.PDP.APT$AResid)
+ggsave("./Compare new and old PDP est/Study2_APT_AResid.jpg",
+       qplot(s2.widePDP$APT_AResid, s2.PDP.APT$AResid,
+             xlab = "Old PDP-A", ylab = "New PDP-A", main = "APT"))
+# WIT C ESTIMATES: r = .98
+cor(s2.widePDP$WIT_MeanC, s2.PDP.WIT$C_mean)
+ggsave("./Compare new and old PDP est/Study2_WIT_Cmean.jpg",
+       qplot(s2.widePDP$WIT_MeanC, s2.PDP.WIT$C_mean,
+             xlab = "Old PDP-C", ylab = "New PDP-C", main = "WIT"))
+# WIT A ESTIMATES: r = .77
+cor(s2.widePDP$WIT_AResid, s2.PDP.WIT$AResid)
+ggsave("./Compare new and old PDP est/Study2_WIT_AResid.jpg",
+       qplot(s2.widePDP$WIT_AResid, s2.PDP.WIT$AResid,
+             xlab = "Old PDP-A", ylab = "New PDP-A", main = "WIT"))
+
+# C estimates
+s2.Cest = 
+  cbind(rename(s2.PDP.APT, APT.Cmean.scale = Cmean.scale) %>% 
+        select(APT.Cmean.scale),
+      rename(s2.PDP.WIT, WIT.Cmean.scale = Cmean.scale) %>% 
+        select(WIT.Cmean.scale))
+
+ggplot(s2.Cest, aes(WIT.Cmean.scale, APT.Cmean.scale)) +
+  geom_point() +
+  geom_smooth(method = "lm") +
+  #  ggtitle("Correlation between accuracy on WIT and accuracy on AP") +
+  labs(x = "WIT PDP-C", y = "AP PDP-C") +
+  theme_bw()+
+  theme(axis.title.x = element_text(size=20),
+        axis.title.y = element_text(size=20),
+        title = element_text(size=20)
+        #axis.text.x  = element_text(angle=90, vjust=0.5, size=16)
+  )
+
+lm(WIT.Cmean.scale ~ APT.Cmean.scale, data = s2.Cest) %>% summary()
+
+# A estimates
+s2.Aest = 
+  cbind(rename(s2.PDP.APT, APT.AResid.scale = AResid.scale) %>% 
+        select(APT.AResid.scale),
+      rename(s2.PDP.WIT, WIT.AResid.scale = AResid.scale) %>% 
+        select(WIT.AResid.scale))
+
+ggplot(s2.Aest, aes(WIT.AResid.scale, APT.AResid.scale)) +
+  geom_point() +
+  geom_smooth(method = "lm") +
+  #  ggtitle("Correlation between accuracy on WIT and accuracy on AP") +
+  labs(x = "WIT PDP-A", y = "AP PDP-A") +
+  theme_bw()+
+  theme(axis.title.x = element_text(size=20),
+        axis.title.y = element_text(size=20),
+        title = element_text(size=20)
+        #axis.text.x  = element_text(angle=90, vjust=0.5, size=16)
+  )
+
+lm(WIT.AResid.scale ~ APT.AResid.scale, data = s2.Aest) %>% summary()
+
+
+# Compare C and A resid 
+s2.Aest$EstType = "A"
+names(s2.Aest) = c("APT", "WIT", "EstType")
+
+s2.Cest$Type = "C"
+names(s2.Cest) = c("APT", "WIT", "EstType")
+
+compareAC = rbind(s2.Aest, s2.Cest)
+
+ggplot(compareAC, aes(WIT, APT, pch = EstType)) +
+  geom_point(aes(shape = EstType), size = 2.5, alpha = .7) +
+  scale_shape_manual(values=c(1,17)) +
+  scale_linetype_manual(values=c("solid", "dashed")) +
+  theme_bw() +
+  geom_smooth(method = "lm", aes(linetype=EstType), color = "black", fullrange = T) +
+  labs(x = "PDP estimates for WIT", y = "PDP estimates for APT") +
+  theme(panel.grid.major = element_line(color = "white"),
+        panel.grid.minor = element_line(color = "white"),
+        legend.title = element_blank(),
+        legend.key.size = unit(1.2, "cm"),
+        axis.title.x = element_text(size=20),
+        axis.title.y = element_text(size=20),
+        axis.text.x = element_text(size=16),
+        axis.text.y = element_text(size=16))+
+  coord_cartesian(expand=c(0,0))
+
+ggsave("./Figures/Study2_CompareAC.tiff")
+
+lm(WIT ~ APT*EstType, data = compareAC) %>% summary()
+
+```
+``` {r, echo=F, eval=F}
+# run other models to get f^2 (measures local effect size)
+# f^2 = (R^2(full) - R^2(reduced))/(1-R^2(full))
+# where full has all predictors/interactions and reduced has all but the one you want the effect size for
+
+full = lm(WIT ~ APT*EstType, data = compareAC) %>% summary()
+reduced = lm(WIT ~ APT+EstType, data = compareAC) %>% summary() 
+
+(full$r.squared - reduced$r.squared)/(1-full$r.squared)
+
+```
+
+### STOP HERE
+
+### 4. Effect of observer on response accuracy bias, PDP-A, PDP-C, anxiety
+
+####Study 1:  
+``` {r}
+
+WIT = select(s1.widePDP, Subject, Observer, WIT_MeanC, WIT_AResid) %>% 
+  rename(MeanC = WIT_MeanC, AResid = WIT_AResid)
+WIT$Task = "WIT"
+
+APT = select(s1.widePDP, Subject, Observer, APT_MeanC, APT_AResid) %>% 
+  rename(MeanC = APT_MeanC, AResid = APT_AResid)
+APT$Task = "APT"
+
+# put them together
+s1.wide = rbind(WIT, APT)
+
+# add IMS data
+IMS = read.delim("Study1_experimentalTrials.txt") %>% 
+  filter(blockName == "WIT", SubTrial == 1) %>% 
+  select(Subject, IMS)
+
+s1.wide$IMS = NA
+for (k in IMS$Subject[!(is.na(IMS$IMS))]) {
+  s1.wide$IMS[s1.wide$Subject == k] = IMS$IMS[IMS$Subject == k]
+}
+
+# add response accuracy data
+s1.wide$perfBias = NA
+for (k in unique(s1.perfBias$Subject)) {
+  s1.wide$perfBias[s1.wide$Subject == k & s1.wide$Task == "WIT"] = s1.perfBias$WITperfBias[s1.perfBias$Subject == k]
+  s1.wide$perfBias[s1.wide$Subject == k & s1.wide$Task == "APT"] = s1.perfBias$APperfBias[s1.perfBias$Subject == k]  
+}
+
+
+
+# Calculate partial etq-squared 
+# SS.effect/(SS.effect + SS.total)
+
+# Perf bias
+m1 = lm(perfBias ~ scale(IMS)*Observer*Task, data = s1.wide) %>% 
+  summary()
+# PDP-C
+m2 = lm(MeanC ~ scale(IMS)*Observer*Task, data = s1.wide) %>% 
+  summary()
+# PDP-A
+m3 = lm(AResid ~ scale(IMS)*Observer*Task, data = s1.wide) %>% 
+  summary()
+
+```
+
+**Perf bias:**
+  
+``` {r}
+m1
+```
+
+**PDP-C estimates:**
+  
+``` {r}
+m2
+```
+
+**PDP-A estimates:**
+  
+``` {r}
+m3
+```
+**Probe interaction for PDP-A:**  
+*Observer Present:*
+```{r}
+# Look at each level of observer separately
+## Present
+lm(AResid ~ scale(IMS)*Task, data = s1.wide[s1.wide$Observer == "Present",]) %>%
+  summary()
+```
+*Observer Absent:*
+``` {r}
+## Absent
+lm(AResid ~ scale(IMS)*Task, data = s1.wide[s1.wide$Observer == "Absent",]) %>%
+  summary()
+```
+**Simple slopes:**
+``` {r}
+# simple slopes
+lm(scale(AResid) ~ scale(IMS), data = s1.wide[s1.wide$Observer == "Present" & s1.wide$Task == "APT",]) %>%
+  summary()
+lm(scale(AResid) ~ scale(IMS), data = s1.wide[s1.wide$Observer == "Present" & s1.wide$Task == "WIT",]) %>%
+  summary()
+
+# Plot 3-way Observer x IMS x Task interaction on PDP-A
+ggplot(s1.wide, aes(IMS, AResid, pch = Task)) +
+  geom_point(aes(shape = Task), size = 2.5, alpha = .7) +
+  facet_wrap(~Observer) +
+  scale_shape_manual(values=c(1,17)) +
+  scale_linetype_manual(values=c("solid", "dashed")) +
+  theme_bw() +
+  geom_smooth(method = "lm", aes(linetype=Task), color = "black") +
+  labs(x = "Internal motivation (IMS)", y = "PDP-Auto estimate") +
+  theme(panel.grid.major = element_line(color = "white"),
+        panel.grid.minor = element_line(color = "white"),
+        legend.title = element_blank(),
+        legend.key.size = unit(1.2, "cm"),
+        axis.title.x = element_text(size=20),
+        axis.title.y = element_text(size=20),
+        axis.text.x = element_text(size=16),
+        axis.text.y = element_text(size=16),
+        strip.text.x = element_text(size = 16)) +
+  coord_cartesian(ylim=c(-.5,.5))
+
+ggsave("./Figures/3way-PDPAuto_Study1.tiff", width = 9, height = 5)
+
+
+```
+
+####Study 2:  
+``` {r}
+WIT = select(s2.widePDP, Subject, Observer, WIT_MeanC, WIT_AResid) %>% 
+  rename(MeanC = WIT_MeanC, AResid = WIT_AResid)
+WIT$Task = "WIT"
+
+APT = select(s2.widePDP, Subject, Observer, APT_MeanC, APT_AResid) %>% 
+  rename(MeanC = APT_MeanC, AResid = APT_AResid)
+APT$Task = "APT"
+
+# put them together
+s2.wide = rbind(WIT, APT)
+
+
+# add IMS data
+IMS = read.delim("Study2_experimentalTrials.txt") %>% 
+  filter(blockName == "WIT_1", SubTrial == 1) %>% 
+  select(Subject, IMS)
+
+s2.wide$IMS = NA
+for (k in IMS$Subject[!(is.na(IMS$IMS))]) {
+  s2.wide$IMS[s2.wide$Subject == k] = IMS$IMS[IMS$Subject == k]
+}
+
+# add response accuracy data
+s2.wide$perfBias = NA
+for (k in unique(s2.perfBias$Subject)) {
+  s2.wide$perfBias[s2.wide$Subject == k & s2.wide$Task == "WIT"] = s2.perfBias$WITperfBias[s2.perfBias$Subject == k]
+  s2.wide$perfBias[s2.wide$Subject == k & s2.wide$Task == "APT"] = s2.perfBias$APperfBias[s2.perfBias$Subject == k]  
+}
+
+
+
+# Calculate partial etq-squared for 2 way interaction
+# SS.effect/(SS.effect + SS.total)
+
+# Perf bias
+m5 = lm(perfBias ~ scale(IMS)*Observer*Task, data = s2.wide) %>% 
+  summary()
+# PDP-C
+m6 = lm(MeanC ~ scale(IMS)*Observer*Task, data = s2.wide) %>% 
+  summary()
+# PDP-A
+m7 = lm(AResid ~ scale(IMS)*Observer*Task, data = s2.wide) %>% 
+  summary()
+
+```
+
+**Perf bias:**
+  
+``` {r}
+m5
+```
+
+**PDP-C estimates:**
+  
+``` {r}
+m6
+```
+
+**PDP-A estimates:**
+  
+``` {r}
+m7
+
+# Plot 3-way Observer x IMS x Task interaction on PDP-A
+ggplot(s2.wide, aes(IMS, AResid, pch = Task)) +
+  geom_point(aes(shape = Task), size = 2.5, alpha = .7) +
+  facet_wrap(~Observer) +
+  scale_shape_manual(values=c(1,17)) +
+  scale_linetype_manual(values=c("solid", "dashed")) +
+  theme_bw() +
+  geom_smooth(method = "lm", aes(linetype=Task), color = "black") +
+  labs(x = "Internal motivation (IMS)", y = "PDP-Auto estimate") +
+  theme(panel.grid.major = element_line(color = "white"),
+        panel.grid.minor = element_line(color = "white"),
+        legend.title = element_blank(),
+        legend.key.size = unit(1.2, "cm"),
+        axis.title.x = element_text(size=20),
+        axis.title.y = element_text(size=20),
+        axis.text.x = element_text(size=16),
+        axis.text.y = element_text(size=16),
+        strip.text.x = element_text(size = 16)) +
+  coord_cartesian(ylim=c(-.5,.5))
+
+ggsave("./Figures/3way-PDPAuto_Study2.tiff", width = 9, height = 5)
+
+```
+
+
+
