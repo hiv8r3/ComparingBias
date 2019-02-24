@@ -89,18 +89,20 @@ round(cor(filter(pdpAPT, !(Subject %in% noIMS) & !(Subject %in% defEx)) %>%
             select(-Subject, -Task, -Observer)), digits = 2)
 
 
-# Specific tests ---------------------------------------------------
+# Correlation between IMS/EMS ---------------------------------------------------
 
-# original bad subs
-cor.test(pdpAPT$C_black[!(pdpAPT$Subject %in% subBS)], 
-         pdpAPT$IMS[!(pdpAPT$Subject %in% subBS)])
+s1 = read.delim("Study1_pdpEstimates_WIT.txt")
+s1.bsdat = read.delim("Study1_badSubsWIT.txt")
+s1.BS = bs$Subject
 
-# only definite exclusions
-cor.test(pdpAPT$C_black[!(pdpAPT$Subject %in% defExSs)], 
-         pdpAPT$IMS[!(pdpAPT$Subject %in% defExSs)])
+s2 = read.delim("Study2_pdpEstimates_WIT.txt")
+s2.bsdat = read.delim("Study2_badSubsWIT.txt")
+s2.BS = bs$Subject
 
-cor.test(pdpAPT$C_black[!(pdpAPT$Subject %in% defExSs)], 
-         pdpAPT$EMS[!(pdpAPT$Subject %in% defExSs)])
+# original bad subs (in manuscript)- Study 1
+cor.test(s1$IMS[!(s1$Subject %in% s1.BS)], 
+         s1$EMS[!(s1$Subject %in% s1.BS)])
 
-cor.test(pdpAPT$A_neg_black[!(pdpAPT$Subject %in% defExSs)], 
-         pdpAPT$EMS[!(pdpAPT$Subject %in% defExSs)])
+# original bad subs (in manuscript)- Study 2
+cor.test(s2$IMS[!(s2$Subject %in% s2.BS)], 
+         s2$EMS[!(s2$Subject %in% s2.BS)])

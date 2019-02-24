@@ -81,6 +81,14 @@ for (i in unique(expTrials$Subject)) {
   expTrials$EMS[expTrials$Subject == i] = MTCP$EMS[MTCP$Subject == i]
 }
 
+# calculate alphas for IMS and EMS items
+IMS = select(MTCP, IMS_1.rev, IMS_2, IMS_3, IMS_4, IMS_5)
+EMS = select(MTCP, EMS_1, EMS_2, EMS_3, EMS_4, EMS_5)
+require(psych)
+
+alpha(IMS)
+alpha(EMS)
+
 # add observer status
 obs = read.delim("./Data/Study I/ConditionList.txt", stringsAsFactors=F)
 
@@ -260,6 +268,13 @@ qualDat$IMS_1.rev = 10 - qualDat$IMS_1
 qualDat = mutate(qualDat, IMS = (qualDat$IMS_1.rev + qualDat$IMS_2 + qualDat$IMS_3 + qualDat$IMS_4 + qualDat$IMS_5)/5)
 qualDat = mutate(qualDat, EMS = (qualDat$EMS_1 + qualDat$EMS_2 + qualDat$EMS_3 + qualDat$EMS_4 + qualDat$EMS_5)/5)
 
+# calculate alphas for IMS and EMS items
+IMS = select(qualDat, IMS_1.rev, IMS_2, IMS_3, IMS_4, IMS_5)
+EMS = select(qualDat, EMS_1, EMS_2, EMS_3, EMS_4, EMS_5)
+require(psych)
+
+alpha(IMS)
+alpha(EMS)
 
 # Calc social anxiety scores 
 
@@ -459,8 +474,6 @@ WITcomp = select(questWide, -Anx_composite) %>%
 require(psych)
 alpha(APTcomp)
 alpha(WITcomp)
-
-
 
 
 
