@@ -47,7 +47,7 @@ There were 48 trials for each condition in each task (192 trials total for each 
 
 
 ### Study 1: 
-Task is effect coded (APT = -1, WIT = 1). IMS and EMS are both standardized.  
+Task is effect coded (APT = -1, WIT = 1). Observer is effect coded (Absent = -1, Present = 1). IMS and EMS are both standardized.  
 
 An IMS-EMS difference score was created to approximate the degree to which motiviation to be unbiased is internalized. A higher IMS-EMS difference score represents more internalization.  
 ``` {r}
@@ -76,6 +76,10 @@ s1.est = rbind(select(s1.PDP.APT, Task, Subject, IMS, EMS, Observer, Cmean.scale
 # Effect code task
 s1.est$Task.e = -1
 s1.est$Task.e[s1.est$Task == "WIT"] = 1
+
+# Effect code observer
+s1.est$Observer.e = -1
+s1.est$Observer.e[s1.est$Observer == "Present"] = 1
 
 # add IMS-EMS diff score
 s1.est$IMSEMS.diff = s1.est$IMS-s1.est$EMS
@@ -175,7 +179,7 @@ kable(table) %>%
 
 
 ### Study 2: 
-Task is effect coded (APT = -1, WIT = 1). IMS and EMS are both standardized.  
+Task is effect coded (APT = -1, WIT = 1). Observer is effect coded (Absent = -1, Present = 1). IMS and EMS are both standardized.  
 
 An IMS-EMS difference score was created to approximate the degree to which motiviation to be unbiased is internalized. A higher IMS-EMS difference score represents more internalization.  
 ``` {r}
@@ -203,6 +207,11 @@ s2.est = rbind(select(s2.PDP.APT, Task, Subject, IMS, EMS, Observer, Cmean.scale
 # Effect code task
 s2.est$Task.e = -1
 s2.est$Task.e[s2.est$Task == "WIT"] = 1
+
+# Effect code observer
+s2.est$Observer.e = -1
+s2.est$Observer.e[s1.est$Observer == "Present"] = 1
+
 
 # add IMS-EMS diff score
 s2.est$IMSEMS.diff = s2.est$IMS-s2.est$EMS
