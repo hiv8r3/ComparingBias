@@ -21,7 +21,7 @@ require(reshape2)
 require(kableExtra)
 
 ```
-### Includes analyses regarding observer, IMS, and EMS that are included in SM.
+### Analyses involving observer, IMS, and EMS that are included in SM.
 
 **Subject exclusions match manuscript.**
 
@@ -298,5 +298,126 @@ table = round(A4$coefficients, digits=3)
 kable(table) %>% 
   kable_styling(full_width = F, position = "center") %>% 
   row_spec(which(table[,5] < .05), bold = T, background = "#FFFF66")
+```
+
+### Re-analysis of repeated measures ANOVA using MLM
+
+
+#### Study 1:  
+Only showing interaction indicating racial bias (Prime x Target). 
+
+**WIT**  
+```{r data}
+# For analyses with accuracy as DV, need trials to be grouped into conditions (ie number of errors in each condition)
+s1.acc = read.delim("Study1_accuracy.txt")
+
+# separate by task
+s1.acc.APT = s1.acc[s1.acc$Task == "APT",]
+s1.acc.WIT = s1.acc[s1.acc$Task == "WIT",]
+
+# remove bad subs
+s1.bs.APT = read.delim("Study1_badSubsAP.txt")
+s1.acc.APT = s1.acc.APT[!(s1.acc.APT$Subject %in% s1.bs.APT$Subject),]
+
+s1.bs.WIT = read.delim("Study1_badSubsWIT.txt")
+s1.acc.WIT = s1.acc.WIT[!(s1.acc.WIT$Subject %in% s1.bs.WIT$Subject),]
+
+
+# Race x Valence on accuracy (WIT)
+sum = lmer(Accuracy ~ PrimeType*TargetType + (TargetType|Subject), data = s1.acc.WIT) %>% 
+  summary()
+
+sum$call
+sum$coefficients
+
+
+```
+
+**AP**
+``` {r AP}
+# Race x Valence on accuracy (APT)
+sum = lmer(Accuracy ~ PrimeType*TargetType + (TargetType|Subject), data = s1.acc.APT) %>% 
+  summary()
+
+sum$call
+sum$coefficients
+```
+
+
+#### Study 2: 
+Only showing interaction indicating racial bias (Prime x Target).   
+**WIT**  
+```{r data2, echo = FALSE}
+s2.acc = read.delim("Study2_accuracy.txt")
+
+# separate by task
+s2.acc.APT = s2.acc[s2.acc$Task == "APT",]
+s2.acc.WIT = s2.acc[s2.acc$Task == "WIT",]
+
+# remove bad subs
+s2.bs.APT = read.delim("Study2_badSubsAP.txt")
+s2.acc.APT = s2.acc.APT[!(s2.acc.APT$Subject %in% s2.bs.APT$Subject),]
+
+s2.bs.WIT = read.delim("Study2_badSubsWIT.txt")
+s2.acc.WIT = s2.acc.WIT[!(s2.acc.WIT$Subject %in% s2.bs.WIT$Subject),]
+
+# Race x Valence on accuracy (WIT)
+sum = lmer(Accuracy ~ PrimeType*TargetType + (TargetType|Subject), data = s2.acc.WIT) %>% 
+  summary()
+
+sum$call
+sum$coefficients
+```
+
+**AP**
+``` {r AP2}
+# Race x Valence on accuracy (WIT)
+sum = lmer(Accuracy ~ PrimeType*TargetType + (TargetType|Subject), data = s2.acc.APT) %>% 
+  summary()
+
+sum$call
+sum$coefficients
+```
+
+### 2. Comparing accuracy across tasks
+
+#### Study 1
+Don't have to exclude subjects who only have data for one task (MLM doesn't require list-wise deletion).  
+n = 100  
+
+#### A. Correlation between performance bias scores on each task
+No repeated measures.
+
+#### B. Examine 3 way Prime x Target x Task interaction  
+``` {r 3way.s1}
+s1.acc.nobs = rbind(s1.acc.APT, s1.acc.WIT)
+
+# See if pattern of racial bias differs across two tasks- TOTAL ERRORS
+sum2 = lmer(Accuracy ~ (PrimeType*ConType*Task)+(ConType+Task|Subject), data = s1.acc.nobs) %>%
+  summary()
+
+sum2$call
+sum2$coefficients
+
+```
+
+#### Study 2
+Don't have to exclude subjects who only have data for one task (MLM doesn't require list-wise deletion).  
+n = 204 
+
+#### A. Correlation between performance bias scores on each task
+No repeated measures.
+
+#### B. Examine 3 way Prime x Target x Task interaction  
+``` {r 3way.s2}
+s2.acc.nobs = rbind(s2.acc.APT, s2.acc.WIT)
+
+# See if pattern of racial bias differs across two tasks- TOTAL ERRORS
+sum2 = lmer(Accuracy ~ (PrimeType*ConType*Task)+(ConType+Task|Subject), data = s2.acc.nobs) %>%
+  summary()
+
+sum2$call
+sum2$coefficients
+
 ```
 

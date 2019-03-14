@@ -111,10 +111,9 @@ $(document).ready(function () {
 </div>
 
 
-<div id="includes-analyses-regarding-observer-ims-and-ems-that-are-included-in-sm." class="section level2">
-<h2>Includes analyses regarding observer, IMS, and EMS that are included in SM.</h2>
-<div id="subject-exclusions-match-manuscript" class="section level3">
-<h3>Subject exclusions match manuscript</h3>
+<div id="analyses-involving-observer-ims-and-ems-that-are-included-in-sm." class="section level3">
+<h3>Analyses involving observer, IMS, and EMS that are included in SM.</h3>
+<p><strong>Subject exclusions match manuscript.</strong></p>
 <p>Data for Study 1 was collected in Fall 2015. Data for Study 2 was collected in Fall 2016.</p>
 <p><strong>In Study 1:</strong><br />
 - 101 subjects participated<br />
@@ -1867,6 +1866,97 @@ scale(IMSEMS.diff):Task.e
 </tbody>
 </table>
 </div>
+</div>
+<div id="re-analysis-of-repeated-measures-anova-using-mlm" class="section level3">
+<h3>Re-analysis of repeated measures ANOVA using MLM</h3>
+<div id="study-1-1" class="section level4">
+<h4>Study 1:</h4>
+<p>Only showing interaction indicating racial bias (Prime x Target).</p>
+<p><strong>WIT</strong></p>
+<pre><code>## lme4::lmer(formula = Accuracy ~ PrimeType * TargetType + (TargetType | 
+##     Subject), data = s1.acc.WIT)</code></pre>
+<pre><code>##                                   Estimate Std. Error       df    t value     Pr(&gt;|t|)
+## (Intercept)                      0.5221920 0.01514795 138.0685  34.472786 0.000000e+00
+## PrimeTypewhite                   0.1222826 0.01357065 182.0003   9.010816 2.220446e-16
+## TargetTypeweapon                 0.1739130 0.01715538 174.6356  10.137524 0.000000e+00
+## PrimeTypewhite:TargetTypeweapon -0.2332428 0.01919179 182.0003 -12.153255 0.000000e+00</code></pre>
+<p><strong>AP</strong></p>
+<pre><code>## lme4::lmer(formula = Accuracy ~ PrimeType * TargetType + (TargetType | 
+##     Subject), data = s1.acc.APT)</code></pre>
+<pre><code>##                                      Estimate Std. Error       df   t value     Pr(&gt;|t|)
+## (Intercept)                        0.61424731 0.01623931 154.5185 37.824728 0.000000e+00
+## PrimeTypewhite                    -0.08624552 0.01619648 184.0001 -5.324955 2.921415e-07
+## TargetTypepositive                -0.04928315 0.01817847 207.9178 -2.711073 7.267279e-03
+## PrimeTypewhite:TargetTypepositive  0.18301971 0.02290528 184.0001  7.990286 1.429967e-13</code></pre>
+</div>
+<div id="study-2-1" class="section level4">
+<h4>Study 2:</h4>
+<p>Only showing interaction indicating racial bias (Prime x Target).<br />
+<strong>WIT</strong></p>
+<pre><code>## lme4::lmer(formula = Accuracy ~ PrimeType * TargetType + (TargetType | 
+##     Subject), data = s2.acc.WIT)</code></pre>
+<pre><code>##                                    Estimate  Std. Error       df   t value Pr(&gt;|t|)
+## (Intercept)                      0.56417504 0.011407110 284.4487  49.45819        0
+## PrimeTypewhite                   0.09610553 0.009541182 395.9999  10.07271        0
+## TargetTypeweapon                 0.14154104 0.012496029 363.6598  11.32688        0
+## PrimeTypewhite:TargetTypeweapon -0.18352178 0.013493269 395.9999 -13.60099        0</code></pre>
+<p><strong>AP</strong></p>
+<pre><code>## lme4::lmer(formula = Accuracy ~ PrimeType * TargetType + (TargetType | 
+##     Subject), data = s2.acc.APT)</code></pre>
+<pre><code>##                                       Estimate Std. Error       df    t value     Pr(&gt;|t|)
+## (Intercept)                        0.588909933 0.01154667 314.5364 51.0025851 0.000000e+00
+## PrimeTypewhite                    -0.071022727 0.01094711 394.0006 -6.4878054 2.617129e-10
+## TargetTypepositive                -0.001788721 0.01298105 411.7154 -0.1377947 8.904700e-01
+## PrimeTypewhite:TargetTypepositive  0.147411616 0.01548155 394.0006  9.5217588 0.000000e+00</code></pre>
+</div>
+</div>
+<div id="comparing-accuracy-across-tasks" class="section level3">
+<h3>2. Comparing accuracy across tasks</h3>
+<div id="study-1-2" class="section level4">
+<h4>Study 1</h4>
+<p>Don’t have to exclude subjects who only have data for one task (MLM doesn’t require list-wise deletion).<br />
+n = 100</p>
+</div>
+<div id="a.-correlation-between-performance-bias-scores-on-each-task" class="section level4">
+<h4>A. Correlation between performance bias scores on each task</h4>
+<p>No repeated measures.</p>
+</div>
+<div id="b.-examine-3-way-prime-x-target-x-task-interaction" class="section level4">
+<h4>B. Examine 3 way Prime x Target x Task interaction</h4>
+<pre><code>## lme4::lmer(formula = Accuracy ~ (PrimeType * ConType * Task) + 
+##     (ConType + Task | Subject), data = s1.acc.nobs)</code></pre>
+<pre><code>##                                              Estimate Std. Error       df   t value     Pr(&gt;|t|)
+## (Intercept)                                0.61332217 0.01549661 197.4841 39.577825 0.000000e+00
+## PrimeTypewhite                             0.04749104 0.01596405 456.5032  2.974874 3.086518e-03
+## ConTypeincongruent                        -0.04899566 0.01716280 443.4256 -2.854760 4.508910e-03
+## TaskWIT                                    0.07761412 0.01637479 495.1316  4.739854 2.799429e-06
+## PrimeTypewhite:ConTypeincongruent         -0.08445341 0.02257658 456.5032 -3.740753 2.068291e-04
+## PrimeTypewhite:TaskWIT                    -0.09912147 0.02263784 456.5032 -4.378574 1.482620e-05
+## ConTypeincongruent:TaskWIT                -0.12393671 0.02267404 462.3717 -5.466017 7.540736e-08
+## PrimeTypewhite:ConTypeincongruent:TaskWIT  0.19903674 0.03201474 456.5032  6.217034 1.144469e-09</code></pre>
+</div>
+<div id="study-2-2" class="section level4">
+<h4>Study 2</h4>
+<p>Don’t have to exclude subjects who only have data for one task (MLM doesn’t require list-wise deletion).<br />
+n = 204</p>
+</div>
+<div id="a.-correlation-between-performance-bias-scores-on-each-task-1" class="section level4">
+<h4>A. Correlation between performance bias scores on each task</h4>
+<p>No repeated measures.</p>
+</div>
+<div id="b.-examine-3-way-prime-x-target-x-task-interaction-1" class="section level4">
+<h4>B. Examine 3 way Prime x Target x Task interaction</h4>
+<pre><code>## lme4::lmer(formula = Accuracy ~ (PrimeType * ConType * Task) + 
+##     (ConType + Task | Subject), data = s2.acc.nobs)</code></pre>
+<pre><code>##                                               Estimate Std. Error       df    t value     Pr(&gt;|t|)
+## (Intercept)                                0.587120649 0.01087266 413.5091 53.9997104 0.000000e+00
+## PrimeTypewhite                             0.074600168 0.01119067 983.2446  6.6662854 4.366330e-11
+## ConTypeincongruent                        -0.001583528 0.01235525 892.8091 -0.1281664 8.980462e-01
+## TaskWIT                                    0.116239687 0.01226275 880.6482  9.4790874 0.000000e+00
+## PrimeTypewhite:ConTypeincongruent         -0.143834175 0.01582599 983.2446 -9.0884785 0.000000e+00
+## PrimeTypewhite:TaskWIT                    -0.120035679 0.01580610 983.2446 -7.5942647 7.194245e-14
+## ConTypeincongruent:TaskWIT                -0.139902365 0.01583978 995.8330 -8.8323408 0.000000e+00
+## PrimeTypewhite:ConTypeincongruent:TaskWIT  0.243394477 0.02235320 983.2446 10.8885763 0.000000e+00</code></pre>
 </div>
 </div>
 

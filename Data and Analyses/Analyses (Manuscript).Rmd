@@ -18,6 +18,7 @@ require(lme4)
 require(lmerTest)
 require(knitr)
 require(reshape2)
+require(MuMIn)
 ```
 
 ### Original subject exclusions
@@ -322,7 +323,7 @@ s1.Cest =
   cbind(rename(s1.PDP.APT, APT.Cmean.scale = Cmean.scale) %>% 
         select(APT.Cmean.scale),
       rename(s1.PDP.WIT, WIT.Cmean.scale = Cmean.scale) %>% 
-        select(WIT.Cmean.scale))
+        select(WIT.Cmean.scale, Subject))
 
 ggplot(s1.Cest, aes(WIT.Cmean.scale, APT.Cmean.scale)) +
   geom_point() +
@@ -343,7 +344,7 @@ s1.Aest =
   cbind(rename(s1.PDP.APT, APT.AResid.scale = AResid.scale) %>% 
         select(APT.AResid.scale),
       rename(s1.PDP.WIT, WIT.AResid.scale = AResid.scale) %>% 
-        select(WIT.AResid.scale))
+        select(WIT.AResid.scale, Subject))
 
 ggplot(s1.Aest, aes(WIT.AResid.scale, APT.AResid.scale)) +
   geom_point() +
@@ -362,10 +363,10 @@ lm(WIT.AResid.scale ~ APT.AResid.scale, data = s1.Aest) %>% summary()
 
 # Compare C and A resid 
 s1.Aest$EstType = "A"
-names(s1.Aest) = c("APT", "WIT", "EstType")
+names(s1.Aest) = c("APT", "WIT", "Subject", "EstType")
 
 s1.Cest$Type = "C"
-names(s1.Cest) = c("APT", "WIT", "EstType")
+names(s1.Cest) = c("APT", "WIT", "Subject", "EstType")
 
 compareAC = rbind(s1.Aest, s1.Cest)
 
@@ -388,18 +389,22 @@ ggplot(compareAC, aes(WIT, APT, pch = EstType)) +
 
 ggsave("./Figures/Study1_CompareAC.tiff")
 
-lm(WIT ~ APT*EstType, data = compareAC) %>% summary()
+sum = lmer(WIT ~ APT*EstType + (1|Subject), data = compareAC) %>% summary()
 
+sum$call
+sum$coefficients
 ```
-``` {r eval=F}
+
+Effect size of interaction:  
+``` {r}
 # run other models to get f^2 (measures local effect size)
 # f^2 = (R^2(full) - R^2(reduced))/(1-R^2(full))
 # where full has all predictors/interactions and reduced has all but the one you want the effect size for
 
-full = lm(WIT ~ APT*EstType, data = compareAC) %>% summary()
-reduced = lm(WIT ~ APT+EstType, data = compareAC) %>% summary() 
+full = lmer(WIT ~ APT*EstType + (1|Subject), data = compareAC) %>% r.squaredGLMM()
+reduced = lmer(WIT ~ APT+EstType + (1|Subject), data = compareAC) %>% r.squaredGLMM() 
 
-(full$r.squared - reduced$r.squared)/(1-full$r.squared)
+(full[2] - reduced[2])/(1-full[2])
 
 ```
 ####Study 2:  
@@ -447,7 +452,7 @@ s2.Cest =
   cbind(rename(s2.PDP.APT, APT.Cmean.scale = Cmean.scale) %>% 
         select(APT.Cmean.scale),
       rename(s2.PDP.WIT, WIT.Cmean.scale = Cmean.scale) %>% 
-        select(WIT.Cmean.scale))
+        select(WIT.Cmean.scale, Subject))
 
 ggplot(s2.Cest, aes(WIT.Cmean.scale, APT.Cmean.scale)) +
   geom_point() +
@@ -468,7 +473,7 @@ s2.Aest =
   cbind(rename(s2.PDP.APT, APT.AResid.scale = AResid.scale) %>% 
         select(APT.AResid.scale),
       rename(s2.PDP.WIT, WIT.AResid.scale = AResid.scale) %>% 
-        select(WIT.AResid.scale))
+        select(WIT.AResid.scale, Subject))
 
 ggplot(s2.Aest, aes(WIT.AResid.scale, APT.AResid.scale)) +
   geom_point() +
@@ -487,10 +492,10 @@ lm(WIT.AResid.scale ~ APT.AResid.scale, data = s2.Aest) %>% summary()
 
 # Compare C and A resid 
 s2.Aest$EstType = "A"
-names(s2.Aest) = c("APT", "WIT", "EstType")
+names(s2.Aest) = c("APT", "WIT", "Subject", "EstType")
 
 s2.Cest$Type = "C"
-names(s2.Cest) = c("APT", "WIT", "EstType")
+names(s2.Cest) = c("APT", "WIT", "Subject", "EstType")
 
 compareAC = rbind(s2.Aest, s2.Cest)
 
@@ -513,18 +518,21 @@ ggplot(compareAC, aes(WIT, APT, pch = EstType)) +
 
 ggsave("./Figures/Study2_CompareAC.tiff")
 
-lm(WIT ~ APT*EstType, data = compareAC) %>% summary()
-
+sum = lmer(WIT ~ APT*EstType+(1|Subject), data = compareAC) %>% summary()
+sum$call
+sum$coefficients
 ```
-``` {r eval=F}
+
+Effect size of interaction:  
+``` {r}
 # run other models to get f^2 (measures local effect size)
 # f^2 = (R^2(full) - R^2(reduced))/(1-R^2(full))
 # where full has all predictors/interactions and reduced has all but the one you want the effect size for
 
-full = lm(WIT ~ APT*EstType, data = compareAC) %>% summary()
-reduced = lm(WIT ~ APT+EstType, data = compareAC) %>% summary() 
+full = lmer(WIT ~ APT*EstType+(1|Subject), data = compareAC) %>% r.squaredGLMM()
+reduced = lmer(WIT ~ APT+EstType+(1|Subject), data = compareAC) %>% r.squaredGLMM() 
 
-(full$r.squared - reduced$r.squared)/(1-full$r.squared)
+(full[2] - reduced[2])/(1-full[2])
 
 ```
 
