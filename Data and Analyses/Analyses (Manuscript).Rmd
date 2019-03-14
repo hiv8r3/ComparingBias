@@ -65,21 +65,29 @@ s1.acc.APT$Subject = factor(s1.acc.APT$Subject)
 s1.acc.WIT$Subject = factor(s1.acc.WIT$Subject)
 
 # Race x Valence on accuracy (WIT)
-sum = aov(Accuracy ~ PrimeType*TargetType + Error(Subject/(PrimeType*TargetType)), data = s1.acc.WIT) %>% 
+sum = aov(Accuracy ~ PrimeType*ConType + Error(Subject/(PrimeType*ConType)), data = s1.acc.WIT) %>% 
   summary()
 
-sum$`Error: Subject:PrimeType:TargetType`
-
-
+sum$`Error: Subject:ConType`
+```
+``` {r, eval=F}
+# Calculate partial etq-squared for effect of congruence
+# SS.effect/(SS.effect + SS.total)
+1.251/(1.251+1.18) # partial eta-sq = .51
 ```
 
 **AP**
 ``` {r AP}
 # Race x Valence on accuracy (WIT)
-sum = aov(Accuracy ~ PrimeType*TargetType + Error(Subject/(PrimeType*TargetType)), data = s1.acc.APT) %>% 
+sum = aov(Accuracy ~ PrimeType*ConType + Error(Subject/(PrimeType*ConType)), data = s1.acc.APT) %>% 
   summary()
 
-sum$`Error: Subject:PrimeType:TargetType`
+sum$`Error: Subject:ConType`
+```
+``` {r, eval=F}
+# Calculate partial etq-squared for effect of congruence
+# SS.effect/(SS.effect + SS.total)
+.7788/(.7788+1.7992) # partial eta-sq = .30
 ```
 
 
@@ -104,19 +112,19 @@ s2.acc.APT$Subject = factor(s2.acc.APT$Subject)
 s2.acc.WIT$Subject = factor(s2.acc.WIT$Subject)
 
 # Race x Valence on accuracy (WIT)
-sum = aov(Accuracy ~ PrimeType*TargetType + Error(Subject/(PrimeType*TargetType)), data = s2.acc.WIT) %>% 
+sum = aov(Accuracy ~ PrimeType*ConType + Error(Subject/(PrimeType*ConType)), data = s2.acc.WIT) %>% 
   summary()
 
-sum$`Error: Subject:PrimeType:TargetType`
+sum$`Error: Subject:ConType`
 ```
 
 **AP**
 ``` {r AP2}
 # Race x Valence on accuracy (WIT)
-sum = aov(Accuracy ~ PrimeType*TargetType + Error(Subject/(PrimeType*TargetType)), data = s2.acc.APT) %>% 
+sum = aov(Accuracy ~ PrimeType*ConType + Error(Subject/(PrimeType*ConType)), data = s2.acc.APT) %>% 
   summary()
 
-sum$`Error: Subject:PrimeType:TargetType`
+sum$`Error: Subject:ConType`
 ```
 
 ### 2. Comparing accuracy across tasks
