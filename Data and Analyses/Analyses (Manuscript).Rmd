@@ -127,7 +127,7 @@ sum = aov(Accuracy ~ PrimeType*ConType + Error(Subject/(PrimeType*ConType)), dat
 sum$`Error: Subject:ConType`
 ```
 
-### 2. Comparing accuracy across tasks
+### 2. Comparing responses across tasks
 
 #### Study 1
 Excludes subjects that don't have data in both tasks (only includes sample of 90).  
@@ -276,6 +276,21 @@ sum2 = aov(Accuracy ~ (PrimeType*ConType*Task)+Error(Subject/(PrimeType*ConType*
 
 sum2$`Error: Subject:PrimeType:ConType:Task`
 
+```
+
+#### Compare Study 1 and Study 2  
+Compare magnitude of correlation between perf bias (response accuracy bias) across tasks between studies. 
+``` {r}
+# Put data from both studies together
+s1.perfBias$Study = "Study1"
+s2.perfBias$Study = "Study2"
+
+both.perfBias = rbind(s1.perfBias, s2.perfBias)
+
+sum = lm(APStand ~ WITStand*Study, data = both.perfBias) %>%
+  summary()
+
+sum$coefficients
 ```
 
 ### 3. Correspondance in PDP estimates across tasks  
@@ -542,5 +557,19 @@ reduced = lmer(WIT ~ APT+EstType+(1|Subject), data = compareAC) %>% r.squaredGLM
 
 (full[2] - reduced[2])/(1-full[2])
 
+```
+#### Compare Study 1 and Study 2  
+Compare magnitude of correlation between PDP-A estimates across tasks between studies. 
+``` {r}
+# Put data from both studies together
+s1.Aest$Study = "Study1"
+s2.Aest$Study = "Study2"
+
+both.Aest = rbind(s1.Aest, s2.Aest)
+
+sum = lm(APT ~ WIT*Study, data = both.Aest) %>% summary()
+
+
+sum$coefficients
 ```
 

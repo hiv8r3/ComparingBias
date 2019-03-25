@@ -163,8 +163,8 @@ $(document).ready(function () {
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
 </div>
 </div>
-<div id="comparing-accuracy-across-tasks" class="section level3">
-<h3>2. Comparing accuracy across tasks</h3>
+<div id="comparing-responses-across-tasks" class="section level3">
+<h3>2. Comparing responses across tasks</h3>
 <div id="study-1-1" class="section level4">
 <h4>Study 1</h4>
 <p>Excludes subjects that don’t have data in both tasks (only includes sample of 90).</p>
@@ -236,6 +236,15 @@ $(document).ready(function () {
 ## Residuals              192  2.768  0.0144                   
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
+</div>
+<div id="compare-study-1-and-study-2" class="section level4">
+<h4>Compare Study 1 and Study 2</h4>
+<p>Compare magnitude of correlation between perf bias (response accuracy bias) across tasks between studies.</p>
+<pre><code>##                           Estimate Std. Error       t value   Pr(&gt;|t|)
+## (Intercept)           2.100852e-16 0.09902334  2.121572e-15 1.00000000
+## WITStand              1.851160e-01 0.09957809  1.859003e+00 0.06407943
+## StudyStudy2          -3.238502e-16 0.11990909 -2.700798e-15 1.00000000
+## WITStand:StudyStudy2  2.214127e-01 0.12046652  1.837961e+00 0.06713131</code></pre>
 </div>
 </div>
 <div id="correspondance-in-pdp-estimates-across-tasks" class="section level3">
@@ -340,6 +349,15 @@ $(document).ready(function () {
 ## APT:EstTypeC  3.488517e-01 0.08616095 363.8648  4.048838e+00 6.292215e-05</code></pre>
 <p>Effect size of interaction:</p>
 <pre><code>## [1] 0.01877576</code></pre>
+</div>
+<div id="compare-study-1-and-study-2-1" class="section level4">
+<h4>Compare Study 1 and Study 2</h4>
+<p>Compare magnitude of correlation between PDP-A estimates across tasks between studies.</p>
+<pre><code>##                      Estimate Std. Error       t value   Pr(&gt;|t|)
+## (Intercept)     -7.447584e-17  0.1020122 -7.300678e-16 1.00000000
+## APT              6.146551e-02  0.1025837  5.991741e-01 0.54954303
+## StudyStudy2      7.202811e-17  0.1235284  5.830895e-16 1.00000000
+## APT:StudyStudy2  2.560499e-01  0.1241026  2.063211e+00 0.04001762</code></pre>
 </div>
 </div>
 
