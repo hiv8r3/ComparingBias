@@ -573,3 +573,16 @@ sum = lm(APT ~ WIT*Study, data = both.Aest) %>% summary()
 sum$coefficients
 ```
 
+Compare magnitude of correlation between PDP-C estimates across tasks between studies. 
+``` {r}
+# Put data from both studies together
+s1.Cest$Study = "Study1"
+s2.Cest$Study = "Study2"
+
+both.Cest = rbind(s1.Cest, s2.Cest)
+
+sum = lm(APT ~ WIT*Study, data = both.Cest) %>% summary()
+
+
+sum$coefficients
+```
