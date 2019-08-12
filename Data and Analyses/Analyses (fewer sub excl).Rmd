@@ -11,13 +11,15 @@ output:
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE, warning = FALSE)
 options(width=140)
-require(dplyr)
-require(tidyr)
-require(ggplot2)
-require(lme4)
-require(lmerTest)
-require(knitr)
-require(reshape2)
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(lme4)
+library(lmerTest)
+library(knitr)
+library(reshape2)
+library(MuMIn)
+library(simr)
 ```
 
 ### Original subject exclusions
@@ -69,7 +71,25 @@ sum = aov(Accuracy ~ PrimeType*TargetType + Error(Subject/(PrimeType*TargetType)
 
 sum$`Error: Subject:PrimeType:TargetType`
 
+```
 
+``` {r, eval = F}
+#Calculating effect sizes
+# partial-eta squared
+# SS-between/(SS-between + SS-residual)
+
+# Prime x Target interaction
+1.21/(1.21+1.286)
+
+# Effect of target following Black primes
+aov(Accuracy ~ TargetType + Error(Subject/(TargetType)), data = filter(s1.acc.WIT, PrimeType == "black")) %>% 
+  summary()
+1.34/(1.34+1.27)
+
+# Effect of target following White primes
+aov(Accuracy ~ TargetType + Error(Subject/(TargetType)), data = filter(s1.acc.WIT, PrimeType == "white")) %>% 
+  summary()
+.16/(.16+1.79)
 ```
 
 **AP**
@@ -80,7 +100,25 @@ sum = aov(Accuracy ~ PrimeType*TargetType + Error(Subject/(PrimeType*TargetType)
 
 sum$`Error: Subject:PrimeType:TargetType`
 ```
+``` {r, eval = F}
+#Calculating effect sizes
+# partial-eta squared
+# SS-between/(SS-between + SS-residual)
 
+# Prime x Target interaction
+.77/(.77+1.86)
+
+# Effect of target following Black primes
+aov(Accuracy ~ TargetType + Error(Subject/(TargetType)), data = filter(s1.acc.APT, PrimeType == "black")) %>% 
+  summary()
+.09/(.09+1.56)
+
+# Effect of target following White primes
+aov(Accuracy ~ TargetType + Error(Subject/(TargetType)), data = filter(s1.acc.APT, PrimeType == "white")) %>% 
+  summary()
+.88/(.88+2.098)
+
+```
 
 #### Study 2: 
 Only showing interaction indicating racial bias (Prime x Target). For calculation of effect sizes, see "7 Effect sizes.R"  
@@ -109,6 +147,25 @@ sum = aov(Accuracy ~ PrimeType*TargetType + Error(Subject/(PrimeType*TargetType)
 sum$`Error: Subject:PrimeType:TargetType`
 ```
 
+``` {r, eval = F}
+#Calculating effect sizes
+# partial-eta squared
+# SS-between/(SS-between + SS-residual)
+
+# Prime x Target interaction
+1.635/(1.635+2.8)
+
+# Effect of target following Black primes
+aov(Accuracy ~ TargetType + Error(Subject/(TargetType)), data = filter(s2.acc.WIT, PrimeType == "black")) %>% 
+  summary()
+1.956/(1.956+3.323)
+
+# Effect of target following White primes
+aov(Accuracy ~ TargetType + Error(Subject/(TargetType)), data = filter(s2.acc.WIT, PrimeType == "white")) %>% 
+  summary()
+.168/(.168+3.88)
+```
+
 **AP**
 ``` {r AP2}
 # Race x Valence on accuracy (WIT)
@@ -118,6 +175,24 @@ sum = aov(Accuracy ~ PrimeType*TargetType + Error(Subject/(PrimeType*TargetType)
 sum$`Error: Subject:PrimeType:TargetType`
 ```
 
+``` {r, eval = F}
+#Calculating effect sizes
+# partial-eta squared
+# SS-between/(SS-between + SS-residual)
+
+# Prime x Target interaction
+1.05/(1.05+3.899)
+
+# Effect of target following Black primes
+aov(Accuracy ~ TargetType + Error(Subject/(TargetType)), data = filter(s2.acc.APT, PrimeType == "black")) %>% 
+  summary()
+
+
+# Effect of target following White primes
+aov(Accuracy ~ TargetType + Error(Subject/(TargetType)), data = filter(s2.acc.APT, PrimeType == "white")) %>% 
+  summary()
+2.12/(2.12+4.15)
+```
 ### 2. Comparing accuracy across tasks
 
 #### Study 1
@@ -188,10 +263,12 @@ sum2 = aov(Accuracy ~ (PrimeType*ConType*Task)+Error(Subject/(PrimeType*ConType*
   summary()
 
 sum2$`Error: Subject:PrimeType:ConType:Task`
-
 ```
 
 ``` {r eval=F}
+# partial eta squared
+.488/(.488+1.744)
+
 # check correlation between conditions for sensitivity power analysis
 wide = spread(select(s1.acc.nobs, Subject, TrialType, Accuracy), TrialType, Accuracy)
 
@@ -269,6 +346,10 @@ sum2$`Error: Subject:PrimeType:ConType:Task`
 
 ```
 
+```{r, eval = F}
+# partial eta squared
+1.458/(1.458+2.996)
+```
 ### 3. Correspondance in PDP estimates across tasks  
 Only includes data for participants with data in both tasks (N = 97).  
 
@@ -299,7 +380,7 @@ s1.Cest =
   cbind(rename(s1.PDP.APT, APT.Cmean.scale = Cmean.scale) %>% 
         select(APT.Cmean.scale),
       rename(s1.PDP.WIT, WIT.Cmean.scale = Cmean.scale) %>% 
-        select(WIT.Cmean.scale))
+        select(WIT.Cmean.scale, Subject))
 
 ggplot(s1.Cest, aes(WIT.Cmean.scale, APT.Cmean.scale)) +
   geom_point() +
@@ -320,7 +401,7 @@ s1.Aest =
   cbind(rename(s1.PDP.APT, APT.AResid.scale = AResid.scale) %>% 
         select(APT.AResid.scale),
       rename(s1.PDP.WIT, WIT.AResid.scale = AResid.scale) %>% 
-        select(WIT.AResid.scale))
+        select(WIT.AResid.scale, Subject))
 
 ggplot(s1.Aest, aes(WIT.AResid.scale, APT.AResid.scale)) +
   geom_point() +
@@ -339,10 +420,10 @@ lm(WIT.AResid.scale ~ APT.AResid.scale, data = s1.Aest) %>% summary()
 
 # Compare C and A resid 
 s1.Aest$EstType = "A"
-names(s1.Aest) = c("APT", "WIT", "EstType")
+names(s1.Aest) = c("APT", "WIT", "Subject", "EstType")
 
-s1.Cest$Type = "C"
-names(s1.Cest) = c("APT", "WIT", "EstType")
+s1.Cest$EstType = "C"
+names(s1.Cest) = c("APT", "WIT", "Subject", "EstType")
 
 compareAC = rbind(s1.Aest, s1.Cest)
 
@@ -365,7 +446,9 @@ ggplot(compareAC, aes(WIT, APT, pch = EstType)) +
 
 ggsave("./Figures/Fewer Excluded Subs/Study1_CompareAC.tiff")
 
-lm(WIT ~ APT*EstType, data = compareAC) %>% summary()
+sum = lmer(WIT ~ APT*EstType+(1|Subject), data = compareAC) %>% summary()
+sum$call
+sum$coefficients
 
 ```
 ``` {r eval=F}
@@ -373,10 +456,15 @@ lm(WIT ~ APT*EstType, data = compareAC) %>% summary()
 # f^2 = (R^2(full) - R^2(reduced))/(1-R^2(full))
 # where full has all predictors/interactions and reduced has all but the one you want the effect size for
 
-full = lm(WIT ~ APT*EstType, data = compareAC) %>% summary()
-reduced = lm(WIT ~ APT+EstType, data = compareAC) %>% summary() 
+full = lmer(WIT ~ APT*EstType+(1|Subject), data = compareAC) %>% r.squaredGLMM()
+reduced = lmer(WIT ~ APT+EstType+(1|Subject), data = compareAC) %>% r.squaredGLMM() 
 
-(full$r.squared - reduced$r.squared)/(1-full$r.squared)
+(full[2] - reduced[2])/(1-full[2])
+
+
+# power simulation
+model1 = lmer(WIT ~ APT*EstType+(1|Subject), data = compareAC)
+powerSim(model1, test=fixed("APT:EstTypeC", method = "z"), nsim=100)
 
 ```
 ####Study 2:  
@@ -401,7 +489,7 @@ s2.Cest =
   cbind(rename(s2.PDP.APT, APT.Cmean.scale = Cmean.scale) %>% 
         select(APT.Cmean.scale),
       rename(s2.PDP.WIT, WIT.Cmean.scale = Cmean.scale) %>% 
-        select(WIT.Cmean.scale))
+        select(WIT.Cmean.scale, Subject))
 
 ggplot(s2.Cest, aes(WIT.Cmean.scale, APT.Cmean.scale)) +
   geom_point() +
@@ -422,7 +510,7 @@ s2.Aest =
   cbind(rename(s2.PDP.APT, APT.AResid.scale = AResid.scale) %>% 
         select(APT.AResid.scale),
       rename(s2.PDP.WIT, WIT.AResid.scale = AResid.scale) %>% 
-        select(WIT.AResid.scale))
+        select(WIT.AResid.scale, Subject))
 
 ggplot(s2.Aest, aes(WIT.AResid.scale, APT.AResid.scale)) +
   geom_point() +
@@ -441,10 +529,10 @@ lm(WIT.AResid.scale ~ APT.AResid.scale, data = s2.Aest) %>% summary()
 
 # Compare C and A resid 
 s2.Aest$EstType = "A"
-names(s2.Aest) = c("APT", "WIT", "EstType")
+names(s2.Aest) = c("APT", "WIT", "Subject", "EstType")
 
-s2.Cest$Type = "C"
-names(s2.Cest) = c("APT", "WIT", "EstType")
+s2.Cest$EstType = "C"
+names(s2.Cest) = c("APT", "WIT", "Subject", "EstType")
 
 compareAC = rbind(s2.Aest, s2.Cest)
 
@@ -467,7 +555,9 @@ ggplot(compareAC, aes(WIT, APT, pch = EstType)) +
 
 ggsave("./Figures/Fewer Excluded Subs/Study2_CompareAC.tiff")
 
-lm(WIT ~ APT*EstType, data = compareAC) %>% summary()
+sum = lmer(WIT ~ APT*EstType+(1|Subject), data = compareAC) %>% summary()
+sum$call
+sum$coefficients
 
 ```
 ``` {r eval=F}
@@ -475,10 +565,14 @@ lm(WIT ~ APT*EstType, data = compareAC) %>% summary()
 # f^2 = (R^2(full) - R^2(reduced))/(1-R^2(full))
 # where full has all predictors/interactions and reduced has all but the one you want the effect size for
 
-full = lm(WIT ~ APT*EstType, data = compareAC) %>% summary()
-reduced = lm(WIT ~ APT+EstType, data = compareAC) %>% summary() 
+full = lmer(WIT ~ APT*EstType+(1|Subject), data = compareAC) %>% r.squaredGLMM()
+reduced = lmer(WIT ~ APT+EstType+(1|Subject), data = compareAC) %>% r.squaredGLMM() 
 
-(full$r.squared - reduced$r.squared)/(1-full$r.squared)
+(full[2] - reduced[2])/(1-full[2])
+
+# power simulation
+model1 = lmer(WIT ~ APT*EstType+(1|Subject), data = compareAC)
+powerSim(model1, test=fixed("APT:EstTypeC", method = "z"), nsim=100)
 
 ```
 
