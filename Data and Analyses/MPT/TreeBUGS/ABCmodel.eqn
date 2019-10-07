@@ -1,0 +1,41 @@
+# 4 conditions in each task, 8 possible condition/response combos, WIT first 4 branches, APT second 4 branches
+1      t01      Cwit
+1      t02      (1-Cwit)*Abwit
+1      t02      (1-Cwit)*(1-Abwit)*Gwit
+1      t01      (1-Cwit)*(1-Abwit)*(1-Gwit)
+
+2      t04      Cwit
+2      t04      (1-Cwit)*Abwit
+2      t04      (1-Cwit)*(1-Abwit)*Gwit
+2      t03      (1-Cwit)*(1-Abwit)*(1-Gwit)
+
+3      t05      Cwit
+3      t05      (1-Cwit)*Awwit
+3      t06      (1-Cwit)*(1-Awwit)*Gwit
+3      t05      (1-Cwit)*(1-Awwit)*(1-Gwit)
+
+4      t08      Cwit
+4      t07      (1-Cwit)*Awwit
+4      t08      (1-Cwit)*(1-Awwit)*Gwit
+4      t07      (1-Cwit)*(1-Awwit)*(1-Gwit)
+
+5      t09      Capt
+5      t10      (1-Capt)*Abapt
+5      t10      (1-Capt)*(1-Abapt)*Gapt
+5      t09      (1-Capt)*(1-Abapt)*(1-Gapt)
+
+6      t12      Capt
+6      t12      (1-Capt)*Abapt
+6      t12      (1-Capt)*(1-Abapt)*Gapt
+6      t11      (1-Capt)*(1-Abapt)*(1-Gapt)
+
+7      t13      Capt
+7      t13      (1-Capt)*Awapt
+7      t14      (1-Capt)*(1-Awapt)*Gapt
+7      t13      (1-Capt)*(1-Awapt)*(1-Gapt)
+
+8      t16      Capt
+8      t15      (1-Capt)*Awapt
+8      t16      (1-Capt)*(1-Awapt)*Gapt
+8      t15      (1-Capt)*(1-Awapt)*(1-Gapt)
+

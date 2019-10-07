@@ -1,5 +1,5 @@
 ---
-title: Observer analyses (Manuscript)
+title: Observer analyses (Reported in manuscript)
 author: Hannah, 2/19/2019
 output:
   html_document:
@@ -11,31 +11,32 @@ output:
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE, warning = FALSE)
 options(width=140)
-require(dplyr)
-require(tidyr)
-require(ggplot2)
-require(lme4)
-require(lmerTest)
-require(knitr)
-require(reshape2)
-require(MuMIn)
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(lme4)
+library(lmerTest)
+library(knitr)
+library(reshape2)
+library(MuMIn)
+library(simr)
 ```
 
-### Original subject exclusions
+### Results are reported in manuscript
 
 Data for Study 1 was collected in Fall 2015. Data for Study 2 was collected in Fall 2016.
 
 **In Study 1:**  
 - 101 subjects participated  
-- 8 subjects' AP data was discarded (see "Study1_badsubsAP.txt")  
-- 9 subjects' WIT data was discarded (see "Study1_badsubsWIT.txt")    
-*This left 93 subjects with AP data and 92 subjects with WIT data.*
+- 2 subjects' AP data was discarded (reasons: no data because of comp malfunction, fell asleep)  
+- 3 subjects' WIT data was discarded (reasons: no data because of comp malfunction, mixed up buttons, used one response button > 85% of the time)    
+*This left 99 subjects with AP data and 98 subjects with WIT data.*
 
 **In Study 2:**  
 - 206 subjects participated  
-- 8 subjects' AP data was discarded (see "Study2_badsubsAP.txt")  
-- 7 subjects' WIT data was discarded (see "Study2_badsubsWIT.txt")  
-*This left 198 subjects with AP data and 199 subjects with WIT data.*
+- 5 subjects' AP data was discarded (reasons: no data because of comp malfunction [2 subjects], used one response button > 85% of the time [3 subjects])  
+- 2 subjects' WIT data was discarded (reasons: no data because of comp malfunction, used one response button > 85% of the time)  
+*This left 201 subjects with AP data and 204 subjects with WIT data.*
 
 There were 48 trials for each condition in each task (192 trials total for each task). In Study 2, each task was split into two sections so that participants could answer anxiety questions in the middle and end of each task.
 
@@ -55,41 +56,69 @@ s1.acc.APT = s1.acc[s1.acc$Task == "APT",]
 s1.acc.WIT = s1.acc[s1.acc$Task == "WIT",]
 
 # remove bad subs
-s1.bs.APT = read.delim("Study1_badSubsAP.txt")
-s1.acc.APT = s1.acc.APT[!(s1.acc.APT$Subject %in% s1.bs.APT$Subject),]
+s1.bs.APT = c(53, 64)
+s1.acc.APT = s1.acc.APT[!(s1.acc.APT$Subject %in% s1.bs.APT),]
 
-s1.bs.WIT = read.delim("Study1_badSubsWIT.txt")
-s1.acc.WIT = s1.acc.WIT[!(s1.acc.WIT$Subject %in% s1.bs.WIT$Subject),]
+s1.bs.WIT = c(4, 28, 53)
+s1.acc.WIT = s1.acc.WIT[!(s1.acc.WIT$Subject %in% s1.bs.WIT),]
 
 s1.acc.APT$Subject = factor(s1.acc.APT$Subject)
 s1.acc.WIT$Subject = factor(s1.acc.WIT$Subject)
 
 # Race x Valence on accuracy (WIT)
-sum = aov(Accuracy ~ PrimeType*ConType + Error(Subject/(PrimeType*ConType)), data = s1.acc.WIT) %>% 
+sum = aov(Accuracy ~ PrimeType*TargetType + Error(Subject/(PrimeType*TargetType)), data = s1.acc.WIT) %>% 
   summary()
 
-sum$`Error: Subject:ConType`
+sum$`Error: Subject:PrimeType:TargetType`
+
 ```
-``` {r, eval=F}
-# Calculate partial etq-squared for effect of congruence
-# SS.effect/(SS.effect + SS.total)
-1.251/(1.251+1.18) # partial eta-sq = .51
+
+``` {r, eval = F}
+#Calculating effect sizes
+# partial-eta squared
+# SS-between/(SS-between + SS-residual)
+
+# Prime x Target interaction
+1.21/(1.21+1.286)
+
+# Effect of target following Black primes
+aov(Accuracy ~ TargetType + Error(Subject/(TargetType)), data = filter(s1.acc.WIT, PrimeType == "black")) %>% 
+  summary()
+1.34/(1.34+1.27)
+
+# Effect of target following White primes
+aov(Accuracy ~ TargetType + Error(Subject/(TargetType)), data = filter(s1.acc.WIT, PrimeType == "white")) %>% 
+  summary()
+.16/(.16+1.79)
 ```
 
 **AP**
 ``` {r AP}
 # Race x Valence on accuracy (WIT)
-sum = aov(Accuracy ~ PrimeType*ConType + Error(Subject/(PrimeType*ConType)), data = s1.acc.APT) %>% 
+sum = aov(Accuracy ~ PrimeType*TargetType + Error(Subject/(PrimeType*TargetType)), data = s1.acc.APT) %>% 
   summary()
 
-sum$`Error: Subject:ConType`
+sum$`Error: Subject:PrimeType:TargetType`
 ```
-``` {r, eval=F}
-# Calculate partial etq-squared for effect of congruence
-# SS.effect/(SS.effect + SS.total)
-.7788/(.7788+1.7992) # partial eta-sq = .30
-```
+``` {r, eval = F}
+#Calculating effect sizes
+# partial-eta squared
+# SS-between/(SS-between + SS-residual)
 
+# Prime x Target interaction
+.77/(.77+1.86)
+
+# Effect of target following Black primes
+aov(Accuracy ~ TargetType + Error(Subject/(TargetType)), data = filter(s1.acc.APT, PrimeType == "black")) %>% 
+  summary()
+.09/(.09+1.56)
+
+# Effect of target following White primes
+aov(Accuracy ~ TargetType + Error(Subject/(TargetType)), data = filter(s1.acc.APT, PrimeType == "white")) %>% 
+  summary()
+.88/(.88+2.098)
+
+```
 
 #### Study 2: 
 Only showing interaction indicating racial bias (Prime x Target). For calculation of effect sizes, see "7 Effect sizes.R"  
@@ -102,43 +131,80 @@ s2.acc.APT = s2.acc[s2.acc$Task == "APT",]
 s2.acc.WIT = s2.acc[s2.acc$Task == "WIT",]
 
 # remove bad subs
-s2.bs.APT = read.delim("Study2_badSubsAP.txt")
-s2.acc.APT = s2.acc.APT[!(s2.acc.APT$Subject %in% s2.bs.APT$Subject),]
+s2.bs.APT = c(1, 9, 37, 87, 102)
+s2.acc.APT = s2.acc.APT[!(s2.acc.APT$Subject %in% s2.bs.APT),]
 
-s2.bs.WIT = read.delim("Study2_badSubsWIT.txt")
-s2.acc.WIT = s2.acc.WIT[!(s2.acc.WIT$Subject %in% s2.bs.WIT$Subject),]
+s2.bs.WIT = c(1, 9)
+s2.acc.WIT = s2.acc.WIT[!(s2.acc.WIT$Subject %in% s2.bs.WIT),]
 
 s2.acc.APT$Subject = factor(s2.acc.APT$Subject)
 s2.acc.WIT$Subject = factor(s2.acc.WIT$Subject)
 
 # Race x Valence on accuracy (WIT)
-sum = aov(Accuracy ~ PrimeType*ConType + Error(Subject/(PrimeType*ConType)), data = s2.acc.WIT) %>% 
+sum = aov(Accuracy ~ PrimeType*TargetType + Error(Subject/(PrimeType*TargetType)), data = s2.acc.WIT) %>% 
   summary()
 
-sum$`Error: Subject:ConType`
+sum$`Error: Subject:PrimeType:TargetType`
+```
+
+``` {r, eval = F}
+#Calculating effect sizes
+# partial-eta squared
+# SS-between/(SS-between + SS-residual)
+
+# Prime x Target interaction
+1.635/(1.635+2.8)
+
+# Effect of target following Black primes
+aov(Accuracy ~ TargetType + Error(Subject/(TargetType)), data = filter(s2.acc.WIT, PrimeType == "black")) %>% 
+  summary()
+1.956/(1.956+3.323)
+
+# Effect of target following White primes
+aov(Accuracy ~ TargetType + Error(Subject/(TargetType)), data = filter(s2.acc.WIT, PrimeType == "white")) %>% 
+  summary()
+.168/(.168+3.88)
 ```
 
 **AP**
 ``` {r AP2}
 # Race x Valence on accuracy (WIT)
-sum = aov(Accuracy ~ PrimeType*ConType + Error(Subject/(PrimeType*ConType)), data = s2.acc.APT) %>% 
+sum = aov(Accuracy ~ PrimeType*TargetType + Error(Subject/(PrimeType*TargetType)), data = s2.acc.APT) %>% 
   summary()
 
-sum$`Error: Subject:ConType`
+sum$`Error: Subject:PrimeType:TargetType`
 ```
 
-### 2. Comparing responses across tasks
+``` {r, eval = F}
+#Calculating effect sizes
+# partial-eta squared
+# SS-between/(SS-between + SS-residual)
+
+# Prime x Target interaction
+1.05/(1.05+3.899)
+
+# Effect of target following Black primes
+aov(Accuracy ~ TargetType + Error(Subject/(TargetType)), data = filter(s2.acc.APT, PrimeType == "black")) %>% 
+  summary()
+
+
+# Effect of target following White primes
+aov(Accuracy ~ TargetType + Error(Subject/(TargetType)), data = filter(s2.acc.APT, PrimeType == "white")) %>% 
+  summary()
+2.12/(2.12+4.15)
+```
+### 2. Comparing accuracy across tasks
 
 #### Study 1
-Excludes subjects that don't have data in both tasks (only includes sample of 90).  
+Excludes subjects that don't have data in both tasks (only includes sample of 97).  
 
 #### A. Correlation between performance bias scores on each task
 ``` {r perfBias.s1}
 s1.perfBias = read.delim("Study1_perfBias.txt")
 
 # take out bs for both APT and WIT
-s1.perfBias = s1.perfBias[!(s1.perfBias$Subject %in% s1.bs.APT$Subject),]
-s1.perfBias = s1.perfBias[!(s1.perfBias$Subject %in% s1.bs.WIT$Subject),]
+s1.perfBias = s1.perfBias[!(s1.perfBias$Subject %in% s1.bs.APT),]
+s1.perfBias = s1.perfBias[!(s1.perfBias$Subject %in% s1.bs.WIT),]
 
 # standardize perfBias estimates (depends on who is included in the sample, so needs to be done after subs are excluded)
 s1.perfBias$WITStand = scale(s1.perfBias$WITperfBias)
@@ -165,7 +231,7 @@ lm(APStand ~ WITStand, data = s1.perfBias) %>%
 ``` {r 3way.s1}
 # Look just at subjects that have data for both tasks, otherwise throws error ("Error() model is singular")
 # Probably because some subjects don't have data across both levels of task
-s1.acc.nobs = s1.acc[!(s1.acc$Subject %in% s1.bs.WIT$Subject) & !(s1.acc$Subject %in% s1.bs.APT$Subject),]
+s1.acc.nobs = s1.acc[!(s1.acc$Subject %in% s1.bs.WIT) & !(s1.acc$Subject %in% s1.bs.APT),]
 s1.acc.nobs$Subject = factor(s1.acc.nobs$Subject)
 
 # Total number of errors (looking at three-way interaction)
@@ -189,7 +255,7 @@ ggplot(s1.acc.nobs, aes(PrimeType, Accuracy, fill = ConType)) +
         axis.title.x = element_text(size = 14),
         axis.title.y = element_text(size = 14))
 
-ggsave("./Figures/Accuracy_Study1.tiff")
+ggsave("./Figures/Fewer Excluded Subs/Accuracy_Study1.tiff")
 
 
 # See if pattern of racial bias differs across two tasks- TOTAL ERRORS
@@ -197,10 +263,12 @@ sum2 = aov(Accuracy ~ (PrimeType*ConType*Task)+Error(Subject/(PrimeType*ConType*
   summary()
 
 sum2$`Error: Subject:PrimeType:ConType:Task`
-
 ```
 
 ``` {r eval=F}
+# partial eta squared
+.488/(.488+1.744)
+
 # check correlation between conditions for sensitivity power analysis
 wide = spread(select(s1.acc.nobs, Subject, TrialType, Accuracy), TrialType, Accuracy)
 
@@ -208,15 +276,15 @@ rs = cor(select(wide, -Subject))
 ```
 
 #### Study 2
-Excludes subjects that don't have data in both tasks (only includes sample of 195).  
+Excludes subjects that don't have data in both tasks (only includes sample of 201).  
 
 #### A. Correlation between performance bias scores on each task
 ``` {r perfBias.s2}
 s2.perfBias = read.delim("Study2_perfBias.txt")
 
 # take out bs for both APT and WIT
-s2.perfBias = s2.perfBias[!(s2.perfBias$Subject %in% s2.bs.APT$Subject),]
-s2.perfBias = s2.perfBias[!(s2.perfBias$Subject %in% s2.bs.WIT$Subject),]
+s2.perfBias = s2.perfBias[!(s2.perfBias$Subject %in% s2.bs.APT),]
+s2.perfBias = s2.perfBias[!(s2.perfBias$Subject %in% s2.bs.WIT),]
 
 # standardize perfBias estimates (depends on who is included in the sample, so needs to be done after subs are excluded)
 s2.perfBias$WITStand = scale(s2.perfBias$WITperfBias)
@@ -243,7 +311,7 @@ lm(APStand ~ WITStand, data = s2.perfBias) %>%
 ``` {r 3way.s2}
 # Look just at subjects that have data for both tasks, otherwise throws error ("Error() model is singular")
 # Probably because some subjects don't have data across both levels of task
-s2.acc.nobs = s2.acc[!(s2.acc$Subject %in% s2.bs.WIT$Subject) & !(s2.acc$Subject %in% s2.bs.APT$Subject),]
+s2.acc.nobs = s2.acc[!(s2.acc$Subject %in% s2.bs.WIT) & !(s2.acc$Subject %in% s2.bs.APT),]
 s2.acc.nobs$Subject = factor(s2.acc.nobs$Subject)
 
 # Total number of errors (looking at three-way interaction)
@@ -267,7 +335,7 @@ ggplot(s2.acc.nobs, aes(PrimeType, Accuracy, fill = ConType)) +
         axis.title.x = element_text(size = 14),
         axis.title.y = element_text(size = 14))
 
-ggsave("./Figures/Accuracy_Study2.tiff")
+ggsave("./Figures/Fewer Excluded Subs/Accuracy_Study2.tiff")
 
 
 # See if pattern of racial bias differs across two tasks- TOTAL ERRORS
@@ -278,23 +346,12 @@ sum2$`Error: Subject:PrimeType:ConType:Task`
 
 ```
 
-#### Compare Study 1 and Study 2  
-Compare magnitude of correlation between perf bias (response accuracy bias) across tasks between studies. 
-``` {r}
-# Put data from both studies together
-s1.perfBias$Study = "Study1"
-s2.perfBias$Study = "Study2"
-
-both.perfBias = rbind(s1.perfBias, s2.perfBias)
-
-sum = lm(APStand ~ WITStand*Study, data = both.perfBias) %>%
-  summary()
-
-sum$coefficients
+```{r, eval = F}
+# partial eta squared
+1.458/(1.458+2.996)
 ```
-
 ### 3. Correspondance in PDP estimates across tasks  
-Only includes data for participants with data in both tasks (N = 90).  
+Only includes data for participants with data in both tasks (N = 97).  
 
 ####Study 1:  
 ``` {r correl}
@@ -307,39 +364,16 @@ Only includes data for participants with data in both tasks (N = 90).
 s1.PDP.APT = read.delim("Study1_pdpEstimates_APT.txt")
 s1.PDP.WIT = read.delim("Study1_pdpEstimates_WIT.txt")
 
-# take out subs with missing data
-s1.PDP.APT = s1.PDP.APT[!(s1.PDP.APT$Subject %in% s1.bs.WIT$Subject) & !(s1.PDP.APT$Subject %in% s1.bs.APT$Subject),]
+# take out subs
+s1.PDP.APT = s1.PDP.APT[!(s1.PDP.APT$Subject %in% s1.bs.WIT) & !(s1.PDP.APT$Subject %in% s1.bs.APT),]
 
-s1.PDP.WIT = s1.PDP.WIT[!(s1.PDP.WIT$Subject %in% s1.bs.WIT$Subject) & !(s1.PDP.WIT$Subject %in% s1.bs.APT$Subject),]
+s1.PDP.WIT = s1.PDP.WIT[!(s1.PDP.WIT$Subject %in% s1.bs.WIT) & !(s1.PDP.WIT$Subject %in% s1.bs.APT),]
 
 # Add standarized estimates (depends on subjects included)
 s1.PDP.APT$Cmean.scale = scale(s1.PDP.APT$C_mean)
 s1.PDP.WIT$Cmean.scale = scale(s1.PDP.WIT$C_mean)
 s1.PDP.APT$AResid.scale = scale(s1.PDP.APT$AResid)
 s1.PDP.WIT$AResid.scale = scale(s1.PDP.WIT$AResid)
-
-# ## COMPARISON BETWEEN PDP ESTIMATES FROM INITIAL SUBMISSION AND CHANGED PDP ESTIMATES
-# s1.widePDP = read.delim("Old/Study1_PDP_wide.txt")
-# # APT C ESTIMATES: r = .97
-# cor(s1.widePDP$APT_MeanC, s1.PDP.APT$C_mean)
-# ggsave("./Compare new and old PDP est/Study1_APT_Cmean.jpg", 
-#        qplot(s1.widePDP$APT_MeanC, s1.PDP.APT$C_mean, 
-#              xlab = "Old PDP-C", ylab = "New PDP-C", main = "APT"))
-# # APT A ESTIMATES: r = .82
-# cor(s1.widePDP$APT_AResid, s1.PDP.APT$AResid)
-# ggsave("./Compare new and old PDP est/Study1_APT_AResid.jpg", 
-#        qplot(s1.widePDP$APT_AResid, s1.PDP.APT$AResid, 
-#              xlab = "Old PDP-A", ylab = "New PDP-A", main = "APT"))
-# # WIT C ESTIMATES: r = .97
-# cor(s1.widePDP$WIT_MeanC, s1.PDP.WIT$C_mean)
-# ggsave("./Compare new and old PDP est/Study1_WIT_Cmean.jpg", 
-#        qplot(s1.widePDP$WIT_MeanC, s1.PDP.WIT$C_mean, 
-#              xlab = "Old PDP-C", ylab = "New PDP-C", main = "WIT"))
-# # WIT A ESTIMATES: r = .67
-# cor(s1.widePDP$WIT_AResid, s1.PDP.WIT$AResid)
-# ggsave("./Compare new and old PDP est/Study1_WIT_AResid.jpg", 
-#        qplot(s1.widePDP$WIT_AResid, s1.PDP.WIT$AResid, 
-#              xlab = "Old PDP-A", ylab = "New PDP-A", main = "WIT"))
 
 # C estimates
 s1.Cest = 
@@ -388,7 +422,7 @@ lm(WIT.AResid.scale ~ APT.AResid.scale, data = s1.Aest) %>% summary()
 s1.Aest$EstType = "A"
 names(s1.Aest) = c("APT", "WIT", "Subject", "EstType")
 
-s1.Cest$Type = "C"
+s1.Cest$EstType = "C"
 names(s1.Cest) = c("APT", "WIT", "Subject", "EstType")
 
 compareAC = rbind(s1.Aest, s1.Cest)
@@ -410,24 +444,27 @@ ggplot(compareAC, aes(WIT, APT, pch = EstType)) +
         axis.text.y = element_text(size=16))+
   coord_cartesian(expand=c(0,0))
 
-ggsave("./Figures/Study1_CompareAC.tiff")
+ggsave("./Figures/Fewer Excluded Subs/Study1_CompareAC.tiff")
 
-sum = lmer(WIT ~ APT*EstType + (1|Subject), data = compareAC) %>% summary()
-
+sum = lmer(WIT ~ APT*EstType+(1|Subject), data = compareAC) %>% summary()
 sum$call
 sum$coefficients
-```
 
-Effect size of interaction:  
-``` {r}
+```
+``` {r eval=F}
 # run other models to get f^2 (measures local effect size)
 # f^2 = (R^2(full) - R^2(reduced))/(1-R^2(full))
 # where full has all predictors/interactions and reduced has all but the one you want the effect size for
 
-full = lmer(WIT ~ APT*EstType + (1|Subject), data = compareAC) %>% r.squaredGLMM()
-reduced = lmer(WIT ~ APT+EstType + (1|Subject), data = compareAC) %>% r.squaredGLMM() 
+full = lmer(WIT ~ APT*EstType+(1|Subject), data = compareAC) %>% r.squaredGLMM()
+reduced = lmer(WIT ~ APT+EstType+(1|Subject), data = compareAC) %>% r.squaredGLMM() 
 
 (full[2] - reduced[2])/(1-full[2])
+
+
+# power simulation
+model1 = lmer(WIT ~ APT*EstType+(1|Subject), data = compareAC)
+powerSim(model1, test=fixed("APT:EstTypeC", method = "z"), nsim=100)
 
 ```
 ####Study 2:  
@@ -437,38 +474,15 @@ s2.PDP.APT = read.delim("Study2_pdpEstimates_APT.txt")
 s2.PDP.WIT = read.delim("Study2_pdpEstimates_WIT.txt")
 
 # take out subs with missing data
-s2.PDP.APT = s2.PDP.APT[!(s2.PDP.APT$Subject %in% s2.bs.WIT$Subject) & !(s2.PDP.APT$Subject %in% s2.bs.APT$Subject),]
+s2.PDP.APT = s2.PDP.APT[!(s2.PDP.APT$Subject %in% s2.bs.WIT) & !(s2.PDP.APT$Subject %in% s2.bs.APT),]
 
-s2.PDP.WIT = s2.PDP.WIT[!(s2.PDP.WIT$Subject %in% s2.bs.WIT$Subject) & !(s2.PDP.WIT$Subject %in% s2.bs.APT$Subject),]
+s2.PDP.WIT = s2.PDP.WIT[!(s2.PDP.WIT$Subject %in% s2.bs.WIT) & !(s2.PDP.WIT$Subject %in% s2.bs.APT),]
 
 # Add standarized estimates (depends on subjects included)
 s2.PDP.APT$Cmean.scale = scale(s2.PDP.APT$C_mean)
 s2.PDP.WIT$Cmean.scale = scale(s2.PDP.WIT$C_mean)
 s2.PDP.APT$AResid.scale = scale(s2.PDP.APT$AResid)
 s2.PDP.WIT$AResid.scale = scale(s2.PDP.WIT$AResid)
-
-# ## COMPARISON BETWEEN PDP ESTIMATES FROM INITIAL SUBMISSION AND CHANGED PDP ESTIMATES
-# s2.widePDP = read.delim("Old/Study2_PDP_wide.txt")
-# # APT C ESTIMATES: r = .95
-# cor(s2.widePDP$APT_MeanC, s2.PDP.APT$C_mean)
-# ggsave("./Compare new and old PDP est/Study2_APT_Cmean.jpg",
-#        qplot(s2.widePDP$APT_MeanC, s2.PDP.APT$C_mean,
-#              xlab = "Old PDP-C", ylab = "New PDP-C", main = "APT"))
-# # APT A ESTIMATES: r = .72
-# cor(s2.widePDP$APT_AResid, s2.PDP.APT$AResid)
-# ggsave("./Compare new and old PDP est/Study2_APT_AResid.jpg",
-#        qplot(s2.widePDP$APT_AResid, s2.PDP.APT$AResid,
-#              xlab = "Old PDP-A", ylab = "New PDP-A", main = "APT"))
-# # WIT C ESTIMATES: r = .98
-# cor(s2.widePDP$WIT_MeanC, s2.PDP.WIT$C_mean)
-# ggsave("./Compare new and old PDP est/Study2_WIT_Cmean.jpg",
-#        qplot(s2.widePDP$WIT_MeanC, s2.PDP.WIT$C_mean,
-#              xlab = "Old PDP-C", ylab = "New PDP-C", main = "WIT"))
-# # WIT A ESTIMATES: r = .77
-# cor(s2.widePDP$WIT_AResid, s2.PDP.WIT$AResid)
-# ggsave("./Compare new and old PDP est/Study2_WIT_AResid.jpg",
-#        qplot(s2.widePDP$WIT_AResid, s2.PDP.WIT$AResid,
-#              xlab = "Old PDP-A", ylab = "New PDP-A", main = "WIT"))
 
 # C estimates
 s2.Cest = 
@@ -517,7 +531,7 @@ lm(WIT.AResid.scale ~ APT.AResid.scale, data = s2.Aest) %>% summary()
 s2.Aest$EstType = "A"
 names(s2.Aest) = c("APT", "WIT", "Subject", "EstType")
 
-s2.Cest$Type = "C"
+s2.Cest$EstType = "C"
 names(s2.Cest) = c("APT", "WIT", "Subject", "EstType")
 
 compareAC = rbind(s2.Aest, s2.Cest)
@@ -539,15 +553,14 @@ ggplot(compareAC, aes(WIT, APT, pch = EstType)) +
         axis.text.y = element_text(size=16))+
   coord_cartesian(expand=c(0,0))
 
-ggsave("./Figures/Study2_CompareAC.tiff")
+ggsave("./Figures/Fewer Excluded Subs/Study2_CompareAC.tiff")
 
 sum = lmer(WIT ~ APT*EstType+(1|Subject), data = compareAC) %>% summary()
 sum$call
 sum$coefficients
-```
 
-Effect size of interaction:  
-``` {r}
+```
+``` {r eval=F}
 # run other models to get f^2 (measures local effect size)
 # f^2 = (R^2(full) - R^2(reduced))/(1-R^2(full))
 # where full has all predictors/interactions and reduced has all but the one you want the effect size for
@@ -557,32 +570,9 @@ reduced = lmer(WIT ~ APT+EstType+(1|Subject), data = compareAC) %>% r.squaredGLM
 
 (full[2] - reduced[2])/(1-full[2])
 
-```
-#### Compare Study 1 and Study 2  
-Compare magnitude of correlation between PDP-A estimates across tasks between studies. 
-``` {r}
-# Put data from both studies together
-s1.Aest$Study = "Study1"
-s2.Aest$Study = "Study2"
+# power simulation
+model1 = lmer(WIT ~ APT*EstType+(1|Subject), data = compareAC)
+powerSim(model1, test=fixed("APT:EstTypeC", method = "z"), nsim=100)
 
-both.Aest = rbind(s1.Aest, s2.Aest)
-
-sum = lm(APT ~ WIT*Study, data = both.Aest) %>% summary()
-
-
-sum$coefficients
 ```
 
-Compare magnitude of correlation between PDP-C estimates across tasks between studies. 
-``` {r}
-# Put data from both studies together
-s1.Cest$Study = "Study1"
-s2.Cest$Study = "Study2"
-
-both.Cest = rbind(s1.Cest, s2.Cest)
-
-sum = lm(APT ~ WIT*Study, data = both.Cest) %>% summary()
-
-
-sum$coefficients
-```
