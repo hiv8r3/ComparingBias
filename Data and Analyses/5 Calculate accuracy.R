@@ -1,7 +1,7 @@
 # Prepares data for ANOVA analysis 
 
-require(dplyr)
-require(tidyr)
+library(dplyr)
+library(tidyr)
 
 
 # Study 1 -----------------------------------------------------------------

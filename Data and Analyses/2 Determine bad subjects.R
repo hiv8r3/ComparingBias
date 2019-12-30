@@ -1,5 +1,5 @@
 # look at mean RT, num of errors for each subject
-require(dplyr)
+library(dplyr)
 
 # Study I -----------------------------------------------------------------
 

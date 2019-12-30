@@ -1,4 +1,4 @@
-require(dplyr)
+library(dplyr)
 
 # Creates performance bias scores (errors|incongruent - errors|congruent)
 

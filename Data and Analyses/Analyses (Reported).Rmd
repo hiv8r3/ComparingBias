@@ -44,7 +44,7 @@ There were 48 trials for each condition in each task (192 trials total for each 
 #### 2 (Prime: Black/White) x 2 (Target: gun/tool or positive/negative) rANOVA  
 
 #### Study 1:  
-Only showing interaction indicating racial bias (Prime x Target). For calculation of effect sizes, see "7 Effect sizes.R"  
+Only showing interaction indicating racial bias (Prime x Target). For calculation of effect sizes, see Rmarkdown file.  
 
 **WIT**  
 ```{r data}
@@ -65,11 +65,33 @@ s1.acc.WIT = s1.acc.WIT[!(s1.acc.WIT$Subject %in% s1.bs.WIT),]
 s1.acc.APT$Subject = factor(s1.acc.APT$Subject)
 s1.acc.WIT$Subject = factor(s1.acc.WIT$Subject)
 
+# calculate mean accuracy for APT
+APTmeans = select(s1.acc.APT, Accuracy, TrialType) %>% 
+  group_by(TrialType) %>% 
+  summarise_all(mean) %>% 
+  cbind(select(s1.acc.APT, Accuracy, TrialType) %>% 
+          group_by(TrialType) %>% 
+          summarise_all(sd) %>% 
+          rename(SD = Accuracy))
+APTmeans$ErrRate = 1-APTmeans$Accuracy
+
+# calculate mean accuracy for WIT
+WITmeans = select(s1.acc.WIT, Accuracy, TrialType) %>% 
+  group_by(TrialType) %>% 
+  summarise_all(mean) %>% 
+  cbind(select(s1.acc.WIT, Accuracy, TrialType) %>% 
+          group_by(TrialType) %>% 
+          summarise_all(sd) %>% 
+          rename(SD = Accuracy))
+WITmeans$ErrRate = 1-WITmeans$Accuracy
+
 # Race x Valence on accuracy (WIT)
 sum = aov(Accuracy ~ PrimeType*TargetType + Error(Subject/(PrimeType*TargetType)), data = s1.acc.WIT) %>% 
   summary()
 
 sum$`Error: Subject:PrimeType:TargetType`
+
+WITmeans
 
 ```
 
@@ -99,7 +121,10 @@ sum = aov(Accuracy ~ PrimeType*TargetType + Error(Subject/(PrimeType*TargetType)
   summary()
 
 sum$`Error: Subject:PrimeType:TargetType`
+
+APTmeans
 ```
+
 ``` {r, eval = F}
 #Calculating effect sizes
 # partial-eta squared
@@ -118,10 +143,11 @@ aov(Accuracy ~ TargetType + Error(Subject/(TargetType)), data = filter(s1.acc.AP
   summary()
 .88/(.88+2.098)
 
+
 ```
 
 #### Study 2: 
-Only showing interaction indicating racial bias (Prime x Target). For calculation of effect sizes, see "7 Effect sizes.R"  
+Only showing interaction indicating racial bias (Prime x Target). For calculation of effect sizes, see Rmarkdown file.  
 **WIT**  
 ```{r data2, echo = FALSE}
 s2.acc = read.delim("Study2_accuracy.txt")
@@ -140,11 +166,34 @@ s2.acc.WIT = s2.acc.WIT[!(s2.acc.WIT$Subject %in% s2.bs.WIT),]
 s2.acc.APT$Subject = factor(s2.acc.APT$Subject)
 s2.acc.WIT$Subject = factor(s2.acc.WIT$Subject)
 
+# calculate mean accuracy for APT
+APTmeans = select(s2.acc.APT, Accuracy, TrialType) %>% 
+  group_by(TrialType) %>% 
+  summarise_all(mean) %>% 
+  cbind(select(s2.acc.APT, Accuracy, TrialType) %>% 
+          group_by(TrialType) %>% 
+          summarise_all(sd) %>% 
+          rename(SD = Accuracy))
+APTmeans$ErrRate = 1-APTmeans$Accuracy
+
+# calculate mean accuracy for WIT
+WITmeans = select(s2.acc.WIT, Accuracy, TrialType) %>% 
+  group_by(TrialType) %>% 
+  summarise_all(mean) %>% 
+  cbind(select(s2.acc.WIT, Accuracy, TrialType) %>% 
+          group_by(TrialType) %>% 
+          summarise_all(sd) %>% 
+          rename(SD = Accuracy))
+WITmeans$ErrRate = 1-WITmeans$Accuracy
+
+
 # Race x Valence on accuracy (WIT)
 sum = aov(Accuracy ~ PrimeType*TargetType + Error(Subject/(PrimeType*TargetType)), data = s2.acc.WIT) %>% 
   summary()
 
 sum$`Error: Subject:PrimeType:TargetType`
+
+WITmeans
 ```
 
 ``` {r, eval = F}
@@ -173,6 +222,8 @@ sum = aov(Accuracy ~ PrimeType*TargetType + Error(Subject/(PrimeType*TargetType)
   summary()
 
 sum$`Error: Subject:PrimeType:TargetType`
+
+APTmeans
 ```
 
 ``` {r, eval = F}
@@ -196,7 +247,7 @@ aov(Accuracy ~ TargetType + Error(Subject/(TargetType)), data = filter(s2.acc.AP
 ### 2. Comparing accuracy across tasks
 
 #### Study 1
-Excludes subjects that don't have data in both tasks (only includes sample of 97).  
+Excludes subjects that don't have data in both tasks (n = 97).  
 
 #### A. Correlation between performance bias scores on each task
 ``` {r perfBias.s1}
@@ -276,7 +327,7 @@ rs = cor(select(wide, -Subject))
 ```
 
 #### Study 2
-Excludes subjects that don't have data in both tasks (only includes sample of 201).  
+Excludes subjects that don't have data in both tasks (n = 201).  
 
 #### A. Correlation between performance bias scores on each task
 ``` {r perfBias.s2}
@@ -351,7 +402,7 @@ sum2$`Error: Subject:PrimeType:ConType:Task`
 1.458/(1.458+2.996)
 ```
 ### 3. Correspondance in PDP estimates across tasks  
-Only includes data for participants with data in both tasks (N = 97).  
+Only includes data for participants with data in both tasks (N = 97). For race-specific estimate means, see Rmarkdown file.  
 
 ####Study 1:  
 ``` {r correl}
@@ -368,6 +419,17 @@ s1.PDP.WIT = read.delim("Study1_pdpEstimates_WIT.txt")
 s1.PDP.APT = s1.PDP.APT[!(s1.PDP.APT$Subject %in% s1.bs.WIT) & !(s1.PDP.APT$Subject %in% s1.bs.APT),]
 
 s1.PDP.WIT = s1.PDP.WIT[!(s1.PDP.WIT$Subject %in% s1.bs.WIT) & !(s1.PDP.WIT$Subject %in% s1.bs.APT),]
+
+# calculate means for race-specific estimates
+APTmeans = select(s1.PDP.APT, C_black, C_white, A_neg_black, A_pos_white) %>% 
+  summarize_all(mean)
+APTsds = select(s1.PDP.APT, C_black, C_white, A_neg_black, A_pos_white) %>% 
+  summarize_all(sd)
+
+WITmeans = select(s1.PDP.WIT, C_black, C_white, A_black, A_tool_white) %>% 
+  summarize_all(mean)
+WITsds = select(s1.PDP.WIT, C_black, C_white, A_black, A_tool_white) %>% 
+  summarize_all(sd)
 
 # Add standarized estimates (depends on subjects included)
 s1.PDP.APT$Cmean.scale = scale(s1.PDP.APT$C_mean)
@@ -477,6 +539,17 @@ s2.PDP.WIT = read.delim("Study2_pdpEstimates_WIT.txt")
 s2.PDP.APT = s2.PDP.APT[!(s2.PDP.APT$Subject %in% s2.bs.WIT) & !(s2.PDP.APT$Subject %in% s2.bs.APT),]
 
 s2.PDP.WIT = s2.PDP.WIT[!(s2.PDP.WIT$Subject %in% s2.bs.WIT) & !(s2.PDP.WIT$Subject %in% s2.bs.APT),]
+
+# calculate means for race-specific estimates
+APTmeans = select(s2.PDP.APT, C_black, C_white, A_neg_black, A_pos_white) %>% 
+  summarize_all(mean)
+APTsds = select(s2.PDP.APT, C_black, C_white, A_neg_black, A_pos_white) %>% 
+  summarize_all(sd)
+
+WITmeans = select(s2.PDP.WIT, C_black, C_white, A_black, A_tool_white) %>% 
+  summarize_all(mean)
+WITsds = select(s2.PDP.WIT, C_black, C_white, A_black, A_tool_white) %>% 
+  summarize_all(sd)
 
 # Add standarized estimates (depends on subjects included)
 s2.PDP.APT$Cmean.scale = scale(s2.PDP.APT$C_mean)

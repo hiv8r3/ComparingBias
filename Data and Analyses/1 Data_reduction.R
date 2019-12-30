@@ -2,8 +2,8 @@
 # Isolates experimental trials, writes to .txt file
 # Adds IMS/EMS data; calculates alphas for both scales
 
-require(dplyr)
-require(tidyr)
+library(dplyr)
+library(tidyr)
 
 
 # Study I -----------------------------------------------------------------
